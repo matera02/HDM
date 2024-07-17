@@ -4,6 +4,9 @@ import time
 import optuna
 from concurrent.futures import ThreadPoolExecutor
 
+NTRIALS = 1000
+DIRECTION = 'minimize'
+
 TABU = 'TabuSearch'
 class Utility:
     @staticmethod
@@ -29,7 +32,7 @@ class Utility:
 
 
     @staticmethod
-    def get_optimized_params(study_name, direction, optimization_function, n_trials, n_jobs=4):
+    def get_optimized_params(study_name, optimization_function, direction=DIRECTION,n_trials=NTRIALS, n_jobs=8):
         study = optuna.create_study(study_name=study_name, direction=direction)
         study.optimize(optimization_function, n_trials=n_trials, n_jobs=n_jobs)
         return study.best_params, study.best_value

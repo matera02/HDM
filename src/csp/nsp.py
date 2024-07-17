@@ -1,12 +1,12 @@
 import jpype
 import jpype.imports
-from jpype.types import *
 import numpy as np
 import optuna
 import time
 from src.util.utility import Utility as util
+from functools import partial
 
-FILENAME = "../NSP/1.nsp"
+FILENAME = "src/csp/NSP/N25/1.nsp"
 
 class NSP:
 
@@ -98,8 +98,6 @@ class NSP:
 
 
 def try_algorithms():
-    # NON POSSO RIAVVIARE LA JVM LA DEVO AVVIARE UNA SOLA VOLTA
-    NSP.start()
 
     #filename = "../NSP/1.nsp"
     iterations = 100
@@ -125,18 +123,10 @@ def try_algorithms():
                                                                      mutation_rate, local_search_iterations, crossover_type)
     print(best_fitness)
 
-    NSP.shutdown()
 
-
-
-
-if __name__ == '__main__':
-    #try_algorithms()
-    start_time = time.time()
-    NSP.start()
-
+def try_study_tabu():
     study = optuna.create_study(study_name="Ottimizzazione degli iperparametri della TabuSearch", direction='minimize')
-    study.optimize(NSP.objective_tabu, n_trials=10, n_jobs=2)
+    study.optimize(NSP.objective_tabu, n_trials=10)
     best_params = study.best_params
     best_fitness = study.best_value
     print("Migliori parametri: ", best_params)
@@ -162,7 +152,85 @@ if __name__ == '__main__':
 
     print(best_schedule)
     print()
-    print(tabu_tenure)
+    print(best_fitness)
+
+
+def try_study_genetic_algorithm():
+    study = optuna.create_study(study_name="Ottimizzazione degli iperparametri dell'Algoritmo Genetico con Crossover 1", direction='minimize')
+    crossover_type = 1
+    optimization_function = partial(NSP.objective_genetic_algorithm, crossover_type=crossover_type)
+    study.optimize(optimization_function, n_trials=10, n_jobs=2)
+
+    best_params = study.best_params
+    best_fitness = study.best_value
+
+    print("Migliori parametri: ", best_params)
+    print("Miglior valore: ", best_fitness)
+
+    util.salva_parametri_modello('GeneticAlgorithm', best_params, best_fitness)
+
+    best_data = util.carica_parametri_modello('GeneticAlgorithm')
+
+    params_from_file = best_data['params']
+    fitness_from_file = best_data['fitness']
+
+    print("Parametri caricati: ", params_from_file)
+    print("Fitness con i parametri caricati: ", fitness_from_file)
+
+    population_size = params_from_file['population_size']
+    generations = params_from_file['generations']
+    mutation_rate = params_from_file['mutation_rate']
+
+    best_schedule, best_fitness = NSP.genetic_algorithm(population_size, generations, mutation_rate, crossover_type)
+
+    print(best_schedule)
+    print()
+    print(best_fitness)
+
+def try_study_genetic_local_search():
+    study = optuna.create_study(study_name="Ottimizzazione degli iperparametri dell'Algoritmo Genetico con Local Search e con Crossover 1",
+                                direction='minimize')
+    crossover_type = 1
+    optimization_function = partial(NSP.objective_genetic_algorithm_local_search, crossover_type=crossover_type)
+    study.optimize(optimization_function, n_trials=10, n_jobs=2)
+    
+    best_params = study.best_params
+    best_fitness = study.best_value
+
+    print("Migliori parametri: ", best_params)
+    print("Miglior valore: ", best_fitness)
+
+    util.salva_parametri_modello('GeneticAlgorithmLocalSearch', best_params, best_fitness)
+
+    best_data = util.carica_parametri_modello('GeneticAlgorithmLocalSearch')
+
+    params_from_file = best_data['params']
+    fitness_from_file = best_data['fitness']
+
+    print("Parametri caricati: ", params_from_file)
+    print("Fitness con i parametri caricati: ", fitness_from_file)
+
+    population_size = params_from_file['population_size']
+    generations = params_from_file['generations']
+    mutation_rate = params_from_file['mutation_rate']
+    local_search_iterations = params_from_file['local_search_iterations']
+
+    best_schedule, best_fitness = NSP.genetic_algorithm_local_search(population_size, generations, mutation_rate, 
+                                                                     local_search_iterations, crossover_type)
+    print(best_schedule)
+    print()
+    print(best_fitness)
+
+
+
+if __name__ == '__main__':
+    start_time = time.time()
+    NSP.start()
+    try_algorithms()
+    
+    try_study_tabu()
+    try_study_genetic_algorithm()
+    try_study_genetic_local_search()
 
     NSP.shutdown()
     end_time = time.time()
