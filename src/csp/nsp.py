@@ -20,7 +20,7 @@ class NSP:
         jpype.shutdownJVM()
 
     @staticmethod
-    def __java_array_to_numpy(java_array):
+    def java_array_to_numpy(java_array):
         return np.array(java_array)
     
 
@@ -32,7 +32,7 @@ class NSP:
         from com.mycompany.nsp import NSPTabuSearch
         tabu_search = NSPTabuSearch(filename, iterations, tabu_tenure)
         tabu_search.run()
-        bestSchedule = NSP.__java_array_to_numpy(tabu_search.getBestSchedule())
+        bestSchedule = NSP.java_array_to_numpy(tabu_search.getBestSchedule())
         bestFitness = np.double(tabu_search.getBestFitness())
         #jpype.shutdownJVM()
         return bestSchedule, bestFitness
@@ -47,7 +47,7 @@ class NSP:
         ga = NSPGeneticAlgorithm(filename, population_size, generations, mutation_rate,
                                  crossover_type)
         ga.run()
-        bestSchedule = NSP.__java_array_to_numpy(ga.getBestSchedule())
+        bestSchedule = NSP.java_array_to_numpy(ga.getBestSchedule())
 
         bestFitness = np.double(ga.getBestFitness())
         #jpype.shutdownJVM()
@@ -62,7 +62,7 @@ class NSP:
         gals = NSPGeneticAlgorithmLocalSearch(filename, population_size, generations, mutation_rate,
                                               local_search_iterations, crossover_type)
         gals.run()
-        bestSchedule = NSP.__java_array_to_numpy(gals.getBestSchedule())
+        bestSchedule = NSP.java_array_to_numpy(gals.getBestSchedule())
         bestFitness = np.double(gals.getBestFitness())
         return bestSchedule, bestFitness
     
@@ -228,9 +228,9 @@ if __name__ == '__main__':
     NSP.start()
     try_algorithms()
     
-    try_study_tabu()
-    try_study_genetic_algorithm()
-    try_study_genetic_local_search()
+    #try_study_tabu()
+    #try_study_genetic_algorithm()
+    #try_study_genetic_local_search()
 
     NSP.shutdown()
     end_time = time.time()

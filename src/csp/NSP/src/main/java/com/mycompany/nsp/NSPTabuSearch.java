@@ -51,9 +51,9 @@ public class NSPTabuSearch extends NSP {
     
     private List<int[][][]> getNeighbors(int[][][] schedule) {
         List<int[][][]> neighbors = new ArrayList<>();
-        for(int i = 0; i < super.numNurses; i++){
-            for (int k = 0; k < super.numDays; k++){
-                for(int s = 0; s < super.numShifts; s++){
+        for(int i = 0; i < super.getNumNurses(); i++){
+            for (int k = 0; k < super.getNumDays(); k++){
+                for(int s = 0; s < super.getNumShifts(); s++){
                     if (schedule[i][k][s] == 0) {
                         int[][][] newSchedule = copySchedule(schedule);
                         Arrays.fill(newSchedule[i][k], 0);

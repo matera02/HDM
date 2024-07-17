@@ -26,9 +26,9 @@ public class NSPGeneticAlgorithmLocalSearch extends NSPGeneticAlgorithm {
     @Override
     protected void mutate(int[][][] schedule) {
         if (random.nextDouble() < super.mutationRate) {
-            int i = random.nextInt(super.numNurses);
-            int k = random.nextInt(super.numDays);
-            int s = random.nextInt(super.numShifts);
+            int i = random.nextInt(super.getNumNurses());
+            int k = random.nextInt(super.getNumDays());
+            int s = random.nextInt(super.getNumShifts());
             Arrays.fill(schedule[i][k], 0);
             schedule[i][k][s] = 1;
         }
@@ -41,10 +41,10 @@ public class NSPGeneticAlgorithmLocalSearch extends NSPGeneticAlgorithm {
         int[][][] bestSchedule = this.copySchedule(schedule);
 
         for (int iter = 0; iter < this.localSearchIterations; iter++) {
-            int i = random.nextInt(super.numNurses);
-            int k = random.nextInt(super.numDays);
+            int i = random.nextInt(super.getNumNurses());
+            int k = random.nextInt(super.getNumDays());
             int currentShift = this.getCurrentShift(schedule[i][k]);
-            int newShift = this.randomChoiceExcluding(currentShift, super.numShifts);
+            int newShift = this.randomChoiceExcluding(currentShift, super.getNumShifts());
 
             int[][][] newSchedule = this.copySchedule(schedule);
             newSchedule[i][k][currentShift] = 0;

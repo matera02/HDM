@@ -77,3 +77,11 @@ class Utility:
             except FileNotFoundError:
                 print(f"File {file} not found.")
         return results
+    
+
+    @staticmethod
+    def create_pkl_from_nsp(filename, output_directory, result):
+        base_filename = filename.split('/')[-1].replace('.nsp', '.pkl')
+        output_filename = f"{output_directory}/{base_filename}"
+        with open(output_filename, 'wb') as f:
+            pickle.dump(result, f)

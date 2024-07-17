@@ -57,20 +57,20 @@ public class NSPGeneticAlgorithm extends NSP {
     }
     
     protected int[][][] crossover(Individual[] parents){
-        int[][][] child = new int[super.numNurses][super.numDays][super.numShifts];
+        int[][][] child = new int[super.getNumNurses()][super.getNumDays()][super.getNumShifts()];
         Individual parent1 = parents[random.nextInt(parents.length)];
         Individual parent2 = parents[random.nextInt(parents.length)];
         int crossoverPoint = 0;
         switch(this.crossoverType){
             // Metà colonne di ciascun genitore
             case 1:
-                for(int k = 0; k < super.numDays; k++){
-                    if(k < super.numDays / 2){
-                        for(int i = 0; i < super.numNurses; i++){
+                for(int k = 0; k < super.getNumDays(); k++){
+                    if(k < super.getNumDays() / 2){
+                        for(int i = 0; i < super.getNumNurses(); i++){
                             child[i][k] = parent1.schedule[i][k].clone();
                         }
                     } else {
-                        for(int i = 0; i < super.numNurses; i++){
+                        for(int i = 0; i < super.getNumNurses(); i++){
                             child[i][k] = parent2.schedule[i][k].clone();
                         }
                     }
@@ -78,27 +78,27 @@ public class NSPGeneticAlgorithm extends NSP {
                 break;
             // Random crossover point sul giorno
             case 2:
-                crossoverPoint = random.nextInt(numDays - 1) + 1;
-                for(int i = 0; i < super.numNurses; i++){
+                crossoverPoint = random.nextInt(getNumDays() - 1) + 1;
+                for(int i = 0; i < super.getNumNurses(); i++){
                     
                     for(int k = 0; k < crossoverPoint; k++){
                         child[i][k] = parent1.schedule[i][k].clone();
                     }
-                    for(int k = crossoverPoint; k < numDays; k++){
+                    for(int k = crossoverPoint; k < getNumDays(); k++){
                         child[i][k] = parent2.schedule[i][k].clone();
                     }
                 }
                 break;
             case 3:
                 // Random crossover point sul numero di infermieri
-                crossoverPoint = random.nextInt(numNurses - 1) + 1;
+                crossoverPoint = random.nextInt(getNumNurses() - 1) + 1;
                 for(int i = 0; i < crossoverPoint; i++){
-                    for(int k = 0; k < super.numDays; k++){
+                    for(int k = 0; k < super.getNumDays(); k++){
                         child[i][k] = parent1.schedule[i][k].clone();
                     }
                 }
-                for(int i = crossoverPoint; i < super.numNurses; i++){
-                    for(int k = 0; k < super.numDays; k++){
+                for(int i = crossoverPoint; i < super.getNumNurses(); i++){
+                    for(int k = 0; k < super.getNumDays(); k++){
                         child[i][k] = parent2.schedule[i][k].clone();
                     }
                 }
@@ -114,9 +114,9 @@ public class NSPGeneticAlgorithm extends NSP {
     */
     protected void mutate(int[][][] schedule){
         if(random.nextDouble() < this.mutationRate){
-            int i = random.nextInt(super.numNurses);
-            int k = random.nextInt(super.numDays);
-            int s = random.nextInt(super.numShifts);
+            int i = random.nextInt(super.getNumNurses());
+            int k = random.nextInt(super.getNumDays());
+            int s = random.nextInt(super.getNumShifts());
             Arrays.fill(schedule[i][k], 0);
             schedule[i][k][s] = 1;
         }
