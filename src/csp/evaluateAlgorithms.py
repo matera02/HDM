@@ -38,11 +38,12 @@ def process_file_tabu_search(filename, ouput_directory):
     tabu_tenure = params_from_file['tabu_tenure']
     
     from com.mycompany.nsp import NSPTabuSearch
+    start_time = time.time()
     tabu_search = NSPTabuSearch(filename, iterations, tabu_tenure)
     
     num_nurses, num_days, num_shifts, hospital_coverage, nurse_preferences = get_problem_data(tabu_search)
 
-    start_time = time.time()
+    
     tabu_search.run()
     execution_time = time.time() - start_time
 
@@ -75,11 +76,11 @@ def process_file_genetic_algorithm(filename, output_directory, algorithm, crosso
     mutation_rate = params_from_file['mutation_rate']
 
     from com.mycompany.nsp import NSPGeneticAlgorithm
+    start_time = time.time()
     ga = NSPGeneticAlgorithm(filename, population_size, generations, mutation_rate,
                                  crossover_type)
     
     num_nurses, num_days, num_shifts, hospital_coverage, nurse_preferences = get_problem_data(ga)
-    start_time = time.time()
     ga.run()
     execution_time = time.time() - start_time
 
@@ -122,7 +123,7 @@ def make_solutions_files():
     # ALGORITMO GENETICO CON CT1    
     dest = 'src/csp/data/solutions/genetic_algorithm/ct1'
     gact1 = partial(process_file_genetic_algorithm, algorithm=GACT1, crossover_type=CROSSOVER_TYPE_1)
-    create_files_to_evaluate(1, 100, source, dest, gact1)
+    create_files_to_evaluate(51, 100, source, dest, gact1)
 
     """
     # ALGORITMO GENETICO CON CT2
