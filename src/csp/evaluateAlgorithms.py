@@ -67,23 +67,98 @@ def process_file_tabu_search(filename, ouput_directory):
     util.create_pkl_from_nsp(filename, ouput_directory, result)
 
 def process_file_genetic_algorithm(filename, output_directory, algorithm, crossover_type):
-    pass
+    best_data = util.carica_parametri_modello(algorithm, BEST_PARAMS_FILE)
+    params_from_file = best_data['params']
+
+    population_size = params_from_file['population_size']
+    generations = params_from_file['generations']
+    mutation_rate = params_from_file['mutation_rate']
+
+    from com.mycompany.nsp import NSPGeneticAlgorithm
+    ga = NSPGeneticAlgorithm(filename, population_size, generations, mutation_rate,
+                                 crossover_type)
+    
+    num_nurses, num_days, num_shifts, hospital_coverage, nurse_preferences = get_problem_data(ga)
+    start_time = time.time()
+    ga.run()
+    execution_time = time.time() - start_time
+
+    best_schedule = NSP.java_array_to_numpy(ga.getBestSchedule())
+    best_fitness = np.double(ga.getBestFitness())
+
+    print(f"Processed {filename} with best fitness {best_fitness} in {execution_time} seconds")
+
+    result = {
+        'crossover_type': crossover_type,
+        'population_size': population_size,
+        'generations': generations,
+        'mutation_rate': mutation_rate,
+        'num_nurses': num_nurses,
+        'num_days': num_days,
+        'num_shifts': num_shifts,
+        'hospital_coverage': hospital_coverage,
+        'nurse_preferences': nurse_preferences,
+        'best_schedule': best_schedule,
+        'best_fitness': best_fitness,
+        'execution_time': execution_time
+    }
+
+    util.create_pkl_from_nsp(filename, output_directory, result)
 
 def process_file_genetic_algorithm_local_search(filename, output_directory, algorithm, 
                                                 crossover_type):
     pass
 
-def create_tabu_files(start_file, end_file):
-    util.write_file_result('src/csp/NSP/N25', 'src/csp/data/solutions/tabu',
-                           start_file, end_file, 8, process_file_tabu_search)
-    util.load_results('src/csp/data/solutions/tabu', end_file) # fino a 100 in questo caso
+
+def create_files_to_evaluate(start_file, end_file, source_dir, dest_dir, function, num_workers=8):
+    util.write_file_result(source_dir, dest_dir, start_file, end_file, num_workers, function)
+    util.load_results(dest_dir, end_file)
+
+def make_solutions_files():
+    #create_files_to_evaluate(1, 100, 'src/csp/NSP/N25', 'src/csp/data/solutions/tabu', process_file_tabu_search)
+ 
+    source = 'src/csp/NSP/N25'
+
+    # ALGORITMO GENETICO CON CT1    
+    dest = 'src/csp/data/solutions/genetic_algorithm/ct1'
+    gact1 = partial(process_file_genetic_algorithm, algorithm=GACT1, crossover_type=CROSSOVER_TYPE_1)
+    create_files_to_evaluate(1, 100, source, dest, gact1)
+
+    """
+    # ALGORITMO GENETICO CON CT2
+    dest = 'src/csp/data/solutions/genetic_algorithm/ct2'
+    gact2 = partial(process_file_genetic_algorithm, algorithm=GACT2, crossover_type=CROSSOVER_TYPE_2)
+    create_files_to_evaluate(1, 100, source, dest, gact2)
+
+    # Algoritmo Genetico CON CT3
+    dest = 'src/csp/data/solutions/genetic_algorithm/ct3'
+    gact3 = partial(process_file_genetic_algorithm, algorithm=GACT3, crossover_type=CROSSOVER_TYPE_3)
+    create_files_to_evaluate(1, 100, source, dest, gact3)
+
+    # Genetico con local search e CT1
+    dest = 'src/csp/data/solutions/genetic_algorithm_local_search/ct1'
+    galsct1 = partial(process_file_genetic_algorithm_local_search, algorithm=GALSCT1, crossover_type=CROSSOVER_TYPE_1)
+    create_files_to_evaluate(1, 100, source, dest, galsct1)
+
+    # Genetico con local search e CT2
+    dest = 'src/csp/data/solutions/genetic_algorithm_local_search/ct2'
+    galsct2 = partial(process_file_genetic_algorithm_local_search, algorithm=GALSCT2, crossover_type=CROSSOVER_TYPE_2)
+    create_files_to_evaluate(1, 100, source, dest, galsct2)
+
+    # Genetico con local search e CT2
+    dest = 'src/csp/data/solutions/genetic_algorithm_local_search/ct3'
+    galsct3 = partial(process_file_genetic_algorithm_local_search, algorithm=GALSCT3, crossover_type=CROSSOVER_TYPE_3)
+    create_files_to_evaluate(1, 100, source, dest, galsct3)
+    """
+
 
 if __name__ == '__main__':
     NSP.start()
     #process_file_tabu_search("src/csp/NSP/N25/1.nsp", "src/csp/data/solutions/tabu")
     #util.load_results('src/csp/data/solutions/tabu', 1)
-    create_tabu_files(1, 1000)
-    
+
+    make_solutions_files()
+
     NSP.shutdown()
 
 
