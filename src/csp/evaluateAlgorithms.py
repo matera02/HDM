@@ -123,7 +123,7 @@ def make_solutions_files():
     # ALGORITMO GENETICO CON CT1    
     dest = 'src/csp/data/solutions/genetic_algorithm/ct1'
     gact1 = partial(process_file_genetic_algorithm, algorithm=GACT1, crossover_type=CROSSOVER_TYPE_1)
-    create_files_to_evaluate(51, 100, source, dest, gact1)
+    create_files_to_evaluate(1, 100, source, dest, gact1)
 
     """
     # ALGORITMO GENETICO CON CT2
