@@ -121,16 +121,17 @@ def make_solutions_files():
     source = 'src/csp/NSP/N25'
 
     # ALGORITMO GENETICO CON CT1    
-    dest = 'src/csp/data/solutions/genetic_algorithm/ct1'
-    gact1 = partial(process_file_genetic_algorithm, algorithm=GACT1, crossover_type=CROSSOVER_TYPE_1)
-    create_files_to_evaluate(1, 100, source, dest, gact1)
+    #dest = 'src/csp/data/solutions/genetic_algorithm/ct1'
+    #gact1 = partial(process_file_genetic_algorithm, algorithm=GACT1, crossover_type=CROSSOVER_TYPE_1)
+    #create_files_to_evaluate(1, 100, source, dest, gact1)
 
-    """
+
     # ALGORITMO GENETICO CON CT2
     dest = 'src/csp/data/solutions/genetic_algorithm/ct2'
     gact2 = partial(process_file_genetic_algorithm, algorithm=GACT2, crossover_type=CROSSOVER_TYPE_2)
     create_files_to_evaluate(1, 100, source, dest, gact2)
 
+    """
     # Algoritmo Genetico CON CT3
     dest = 'src/csp/data/solutions/genetic_algorithm/ct3'
     gact3 = partial(process_file_genetic_algorithm, algorithm=GACT3, crossover_type=CROSSOVER_TYPE_3)
@@ -158,7 +159,9 @@ if __name__ == '__main__':
     #process_file_tabu_search("src/csp/NSP/N25/1.nsp", "src/csp/data/solutions/tabu")
     #util.load_results('src/csp/data/solutions/tabu', 1)
 
-    make_solutions_files()
+    #make_solutions_files()
+    dest = 'src/csp/data/solutions/genetic_algorithm/ct1'
+    util.load_results(dest, 100)
 
     NSP.shutdown()
 
