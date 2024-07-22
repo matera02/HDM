@@ -108,7 +108,45 @@ def process_file_genetic_algorithm(filename, output_directory, algorithm, crosso
 
 def process_file_genetic_algorithm_local_search(filename, output_directory, algorithm, 
                                                 crossover_type):
-    pass
+    best_data = util.carica_parametri_modello(algorithm, BEST_PARAMS_FILE)
+
+    params_from_file = best_data['params']
+    population_size = params_from_file['population_size']
+    generations = params_from_file['generations']
+    mutation_rate = params_from_file['mutation_rate']
+    local_search_iterations = params_from_file['local_search_iterations']
+
+    from com.mycompany.nsp import NSPGeneticAlgorithmLocalSearch
+    start_time = time.time()
+    gals = NSPGeneticAlgorithmLocalSearch(filename, population_size, generations, mutation_rate,
+                                              local_search_iterations, crossover_type)
+    num_nurses, num_days, num_shifts, hospital_coverage, nurse_preferences = get_problem_data(gals)
+    gals.run()
+    
+    execution_time = time.time() - start_time
+
+    best_schedule = NSP.java_array_to_numpy(gals.getBestSchedule())
+    best_fitness = np.double(gals.getBestFitness())
+
+    print(f"Processed {filename} with best fitness {best_fitness} in {execution_time} seconds")
+
+    result = {
+        'crossover_type': crossover_type,
+        'population_size': population_size,
+        'generations': generations,
+        'mutation_rate': mutation_rate,
+        'local_search_iterations': local_search_iterations,
+        'num_nurses': num_nurses,
+        'num_days': num_days,
+        'num_shifts': num_shifts,
+        'hospital_coverage': hospital_coverage,
+        'nurse_preferences': nurse_preferences,
+        'best_schedule': best_schedule,
+        'best_fitness': best_fitness,
+        'execution_time': execution_time
+    }
+
+    util.create_pkl_from_nsp(filename, output_directory, result)
 
 
 def create_files_to_evaluate(start_file, end_file, source_dir, dest_dir, function, num_workers=8):
@@ -116,6 +154,8 @@ def create_files_to_evaluate(start_file, end_file, source_dir, dest_dir, functio
     util.load_results(dest_dir, end_file)
 
 def make_solutions_files():
+
+    """
     # Tabu Search
     create_files_to_evaluate(1, 100, 'src/csp/NSP/N25', 'src/csp/data/solutions/tabu', process_file_tabu_search)
  
@@ -137,6 +177,9 @@ def make_solutions_files():
     dest = 'src/csp/data/solutions/genetic_algorithm/ct3'
     gact3 = partial(process_file_genetic_algorithm, algorithm=GACT3, crossover_type=CROSSOVER_TYPE_3)
     create_files_to_evaluate(1, 100, source, dest, gact3)
+    """
+
+    source = 'src/csp/NSP/N25'
 
     # Genetico con local search e CT1
     dest = 'src/csp/data/solutions/genetic_algorithm_local_search/ct1'
@@ -160,6 +203,8 @@ if __name__ == '__main__':
     #util.load_results('src/csp/data/solutions/tabu', 1)
 
     make_solutions_files()
+
+
 
     NSP.shutdown()
 
