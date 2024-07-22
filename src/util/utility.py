@@ -85,3 +85,8 @@ class Utility:
         output_filename = f"{output_directory}/{base_filename}"
         with open(output_filename, 'wb') as f:
             pickle.dump(result, f)
+
+    @staticmethod
+    def get_items_from_results(source, key, num_files=100):
+        results = Utility.load_results(source, num_files)
+        return [result[key] for result in results]
