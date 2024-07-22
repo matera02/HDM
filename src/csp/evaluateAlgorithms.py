@@ -159,9 +159,7 @@ if __name__ == '__main__':
     #process_file_tabu_search("src/csp/NSP/N25/1.nsp", "src/csp/data/solutions/tabu")
     #util.load_results('src/csp/data/solutions/tabu', 1)
 
-    #make_solutions_files()
-    dest = 'src/csp/data/solutions/genetic_algorithm/ct1'
-    util.load_results(dest, 100)
+    make_solutions_files()
 
     NSP.shutdown()
 
