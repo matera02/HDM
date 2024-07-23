@@ -10,6 +10,26 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 
+class ANNModel(nn.Module):
+    def __init__(self, input_dim, n_layers, units, dropout_rate):
+        super(ANNModel, self).__init__()
+        layers = []
+        in_features = input_dim
+        
+        for i in range(n_layers):
+            layers.append(nn.Linear(in_features, units[i]))
+            layers.append(nn.ReLU())
+            layers.append(nn.Dropout(dropout_rate))
+            in_features = units[i]
+        
+        layers.append(nn.Linear(in_features, 1))
+        layers.append(nn.Sigmoid())
+        
+        self.network = nn.Sequential(*layers)
+    
+    def forward(self, x):
+        return self.network(x)
+
 class BayesianOptimization:
     def __init__(self, dataset: str):
         self.dataset = pd.read_csv(dataset)
@@ -70,20 +90,11 @@ class BayesianOptimization:
         return self.cross_validate_model(model)
 
     def optimize_ann(self, trial):
-        n_layers = trial.suggest_int('n_layers', 1, 3)
-        layers = []
-        in_features = self.X.shape[1]
+        n_layers = trial.suggest_int('n_layers', 1, 5)
+        units = [trial.suggest_int(f'n_units_layer_{i}', 4, 128) for i in range(n_layers)]
+        dropout_rate = trial.suggest_float('dropout_rate', 0.1, 0.5)
         
-        for i in range(n_layers):
-            out_features = trial.suggest_int(f'n_units_layer_{i}', 4, 128)
-            layers.append(nn.Linear(in_features, out_features))
-            layers.append(nn.ReLU())
-            in_features = out_features
-
-        layers.append(nn.Linear(in_features, 1))
-        layers.append(nn.Sigmoid())
-        
-        model = nn.Sequential(*layers)
+        model = ANNModel(input_dim=self.X.shape[1], n_layers=n_layers, units=units, dropout_rate=dropout_rate)
         return self.cross_validate_ann_model(model, trial)
 
     def cross_validate_model(self, model):
@@ -119,7 +130,7 @@ class BayesianOptimization:
             model.to(device)
             model.train()
 
-            for epoch in range(10):
+            for epoch in range(20):  # Increased epochs for better training
                 for batch_x, batch_y in train_loader:
                     batch_x, batch_y = batch_x.to(device), batch_y.to(device)
                     optimizer.zero_grad()
@@ -145,35 +156,35 @@ class BayesianOptimization:
     def process_dataset(self):
         # Random Forest
         study_rf = optuna.create_study(direction='minimize')
-        study_rf.optimize(self.optimize_rf, n_trials=100, n_jobs=8)
+        study_rf.optimize(self.optimize_rf, n_trials=50, n_jobs=8)
         best_params_rf = study_rf.best_params
         print("Migliori parametri Random Forest:", best_params_rf)
         joblib.dump(best_params_rf, 'best_params_rf.pkl')
 
         # AdaBoost
         study_adaboost = optuna.create_study(direction='minimize')
-        study_adaboost.optimize(self.optimize_adaboost, n_trials=100, n_jobs=8)
+        study_adaboost.optimize(self.optimize_adaboost, n_trials=50, n_jobs=8)
         best_params_adaboost = study_adaboost.best_params
         print("Migliori parametri AdaBoost:", best_params_adaboost)
         joblib.dump(best_params_adaboost, 'best_params_adaboost.pkl')
 
         # Decision Tree
         study_dt = optuna.create_study(direction='minimize')
-        study_dt.optimize(self.optimize_dt, n_trials=100, n_jobs=8)
+        study_dt.optimize(self.optimize_dt, n_trials=50, n_jobs=8)
         best_params_dt = study_dt.best_params
         print("Migliori parametri Decision Tree:", best_params_dt)
         joblib.dump(best_params_dt, 'best_params_dt.pkl')
 
         # XGBoost
         study_xgboost = optuna.create_study(direction='minimize')
-        study_xgboost.optimize(self.optimize_xgboost, n_trials=100, n_jobs=8)
+        study_xgboost.optimize(self.optimize_xgboost, n_trials=50, n_jobs=8)
         best_params_xgboost = study_xgboost.best_params
         print("Migliori parametri XGBoost:", best_params_xgboost)
         joblib.dump(best_params_xgboost, 'best_params_xgboost.pkl')
 
         # ANN
         study_ann = optuna.create_study(direction='minimize')
-        study_ann.optimize(self.optimize_ann, n_trials=100, n_jobs=8)
+        study_ann.optimize(self.optimize_ann, n_trials=50, n_jobs=8)
         best_params_ann = study_ann.best_params
         print("Migliori parametri ANN:", best_params_ann)
         joblib.dump(best_params_ann, 'best_params_ann.pkl')
@@ -210,19 +221,10 @@ class BayesianOptimization:
 
     def build_ann_model(self, best_params_ann):
         n_layers = best_params_ann['n_layers']
-        layers = []
-        in_features = self.X.shape[1]
+        units = [best_params_ann[f'n_units_layer_{i}'] for i in range(n_layers)]
+        dropout_rate = best_params_ann['dropout_rate']
         
-        for i in range(n_layers):
-            out_features = best_params_ann[f'n_units_layer_{i}']
-            layers.append(nn.Linear(in_features, out_features))
-            layers.append(nn.ReLU())
-            in_features = out_features
-
-        layers.append(nn.Linear(in_features, 1))
-        layers.append(nn.Sigmoid())
-        
-        model = nn.Sequential(*layers)
+        model = ANNModel(input_dim=self.X.shape[1], n_layers=n_layers, units=units, dropout_rate=dropout_rate)
         return model
 
     def train_ann_model(self, model, x_train, y_train, x_test, y_test, best_params_ann):
@@ -237,7 +239,7 @@ class BayesianOptimization:
         test_loader = DataLoader(test_data, batch_size=32, shuffle=False)
 
         model.train()
-        for epoch in range(10):
+        for epoch in range(20):  # Increased epochs for better training
             for batch_x, batch_y in train_loader:
                 batch_x, batch_y = batch_x.to(device), batch_y.to(device)
                 optimizer.zero_grad()
