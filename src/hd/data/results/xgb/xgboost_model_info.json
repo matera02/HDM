@@ -1,0 +1,14 @@
+{
+    "model_name": "XGBoost",
+    "best_params": {
+        "learning_rate": 0.1,
+        "max_depth": 3,
+        "n_estimators": 50
+    },
+    "best_accuracy": 0.8179536679536679,
+    "final_accuracy": 0.8206521739130435,
+    "precision": 0.8270108695652175,
+    "recall": 0.8206521739130435,
+    "f1_score": 0.8218664997193558,
+    "overfitting_analysis": "Il modello sembra ben bilanciato.\nTrain score: media = 0.889, std = 0.008\nTest score: media = 0.822, std = 0.039\nTrain varianza: 0.000\nTest varianza: 0.001\nIl modello sembra stabile sui dati di test."
+}

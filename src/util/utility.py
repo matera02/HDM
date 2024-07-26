@@ -1,12 +1,14 @@
 import pickle
 import time
-
 import optuna
 from concurrent.futures import ThreadPoolExecutor
+from sklearn.base import BaseEstimator, ClassifierMixin
+import numpy as np
+import torch
+from torch.utils.data import DataLoader, TensorDataset
 
 NTRIALS = 1000
 DIRECTION = 'minimize'
-
 TABU = 'TabuSearch'
 class Utility:
     @staticmethod
@@ -90,3 +92,40 @@ class Utility:
     def get_items_from_results(source, key, num_files=100):
         results = Utility.load_results(source, num_files)
         return [result[key] for result in results]
+    
+class PyTorchWrapper(BaseEstimator, ClassifierMixin):
+    def __init__(self, model, criterion, optimizer, batch_size, epochs, device):
+        self.model = model
+        self.criterion = criterion
+        self.optimizer = optimizer
+        self.batch_size = batch_size
+        self.epochs = epochs
+        self.device = device
+        self.classes_ = None
+
+    def fit(self, X, y):
+        self.classes_ = np.unique(y)
+        X = torch.FloatTensor(X).to(self.device)
+        y = torch.LongTensor(y).to(self.device)
+        dataset = TensorDataset(X, y)
+        loader = DataLoader(dataset=dataset, batch_size=self.batch_size, shuffle=True)
+
+        self.model.train()
+        for epoch in range(self.epochs):
+            for inputs, labels in loader:
+                outputs = self.model(inputs)
+                loss = self.criterion(outputs, labels)
+                
+                self.optimizer.zero_grad()
+                loss.backward()
+                self.optimizer.step()
+
+        return self
+
+    def predict(self, X):
+        X = torch.FloatTensor(X).to(self.device)
+        self.model.eval()
+        with torch.no_grad():
+            outputs = self.model(X)
+            _, predicted = torch.max(outputs.data, 1)
+        return predicted.cpu().numpy()

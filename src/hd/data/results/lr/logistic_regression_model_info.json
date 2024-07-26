@@ -1,0 +1,14 @@
+{
+    "model_name": "Logistic Regression",
+    "best_params": {
+        "C": 0.001,
+        "penalty": "l2",
+        "solver": "liblinear"
+    },
+    "best_accuracy": 0.8247563890421035,
+    "final_accuracy": 0.8097826086956522,
+    "precision": 0.8143037968103467,
+    "recall": 0.8097826086956522,
+    "f1_score": 0.810867859003755,
+    "overfitting_analysis": "Il modello sembra ben bilanciato.\nTrain score: media = 0.825, std = 0.009\nTest score: media = 0.825, std = 0.036\nTrain varianza: 0.000\nTest varianza: 0.001\nIl modello sembra stabile sui dati di test."
+}

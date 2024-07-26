@@ -1,0 +1,13 @@
+{
+    "model_name": "AdaBoost",
+    "best_params": {
+        "learning_rate": 0.1,
+        "n_estimators": 100
+    },
+    "best_accuracy": 0.8274682846111417,
+    "final_accuracy": 0.8097826086956522,
+    "precision": 0.8143037968103467,
+    "recall": 0.8097826086956522,
+    "f1_score": 0.810867859003755,
+    "overfitting_analysis": "Il modello sembra ben bilanciato.\nTrain score: media = 0.837, std = 0.007\nTest score: media = 0.825, std = 0.025\nTrain varianza: 0.000\nTest varianza: 0.001\nIl modello sembra stabile sui dati di test."
+}
