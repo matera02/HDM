@@ -9,6 +9,8 @@ from heartDisease import DataSet
 from sklearn.metrics import accuracy_score, classification_report, precision_score, recall_score, f1_score
 import json
 import os
+import src.hd.ann as ann
+
 
 class Model:
     def __init__(self, dataset: DataSet, model, model_name, params, cv=5, n_jobs=8):
@@ -78,17 +80,9 @@ class Model:
             analysis.append("Il modello sembra stabile sui dati di test.")
         return "\n".join(analysis)
     
-    def plot_score_distribution(self, train_scores, test_scores, savefig):
-        plt.figure(figsize=(10, 6))
-        plt.title(f"Distribuzione degli score - {self.model_name}")
-        plt.boxplot([train_scores[-1], test_scores[-1]], labels=['Train', 'Test'])
-        plt.ylabel("Score")
-        plt.savefig(savefig)
-        plt.show()
-    
     
     # Grid Search, training, valutazione e curve di apprendimento per Modello
-    def run(self, dir_json, savefig_learning_curve, savefig_score_distribution):
+    def run(self, dir_json, savefig_learning_curve):
         print(f"Running Grid Search for {self.model_name}...")
         model_grid = GridSearchCV(self.model, self.params, cv=self.cv, n_jobs=self.n_jobs)
         model_grid.fit(self.dataset.X_train, self.dataset.y_train)
@@ -120,9 +114,6 @@ class Model:
         print(f"{self.model_name} Overfitting Analysis: ")
         overfitting_analysis = self.analyze_overfitting(train_scores, test_scores)
         print(overfitting_analysis)
-    
-        # Visualizzazione della distribuzione degli score
-        self.plot_score_distribution(train_scores, test_scores, savefig=savefig_score_distribution)
 
         # Salvataggio delle informazioni del modello
         model_info = {
@@ -141,6 +132,7 @@ class Model:
         with open(dest, "w") as f:
             json.dump(model_info, f, indent=4)
 
+
 if __name__ == '__main__':
     dataset = DataSet()
     
@@ -152,8 +144,7 @@ if __name__ == '__main__':
     }
     
     dt_model = Model(dataset, dt, "Decision Tree", dt_params)
-    dt_model.run(dir_json='src/hd/data/results/dt/', savefig_learning_curve='src/hd/data/results/dt/learning_curve_dt.png', 
-                 savefig_score_distribution='src/hd/data/results/dt/score_distribution_dt.png')
+    dt_model.run(dir_json='src/hd/data/results/dt/', savefig_learning_curve='src/hd/data/results/dt/learning_curve_dt.png')
 
     lr = LogisticRegression(random_state=42)
 
@@ -164,8 +155,7 @@ if __name__ == '__main__':
     }
 
     lr_model = Model(dataset, lr, 'Logistic Regression', lr_params)
-    lr_model.run(dir_json='src/hd/data/results/lr/', savefig_learning_curve='src/hd/data/results/lr/learning_curve_lr.png', 
-                 savefig_score_distribution='src/hd/data/results/lr/score_distribution_lr.png')
+    lr_model.run(dir_json='src/hd/data/results/lr/', savefig_learning_curve='src/hd/data/results/lr/learning_curve_lr.png')
 
     ab = AdaBoostClassifier(random_state=42, algorithm='SAMME')
 
@@ -175,8 +165,7 @@ if __name__ == '__main__':
     }
 
     ab_model = Model(dataset, ab, 'AdaBoost', ab_params)
-    ab_model.run(dir_json='src/hd/data/results/ab/', savefig_learning_curve='src/hd/data/results/ab/learning_curve_ab.png', 
-                 savefig_score_distribution='src/hd/data/results/ab/score_distribution_ab.png')
+    ab_model.run(dir_json='src/hd/data/results/ab/', savefig_learning_curve='src/hd/data/results/ab/learning_curve_ab.png')
 
     xgbc = xgb.XGBClassifier(random_state=42)
 
@@ -187,6 +176,12 @@ if __name__ == '__main__':
     }
 
     xgb_model = Model(dataset, xgbc, 'XGBoost', xgb_params)
-    xgb_model.run(dir_json='src/hd/data/results/xgb/', savefig_learning_curve='src/hd/data/results/xgb/learning_curve_xgb.png',
-                  savefig_score_distribution='src/hd/data/results/xgb/score_distribution_xgb.png')
+    xgb_model.run(dir_json='src/hd/data/results/xgb/', savefig_learning_curve='src/hd/data/results/xgb/learning_curve_xgb.png')
 
+    scaled_dataset = ann.ScaledDataSet(dataset)
+
+    arnn, arnn_params = ann.get_skorch_ann_and_params(scaled_dataset)
+
+    # multi-thread diventa problematico
+    ann_model = Model(scaled_dataset, arnn, 'ANN', arnn_params, n_jobs=1)
+    ann_model.run(dir_json='src/hd/data/results/ann/', savefig_learning_curve='src/hd/data/results/ann/learning_curve_ann.png')
