@@ -126,6 +126,7 @@ def lowestCostSearch(graph, start, goal):
                 for adj in graph.neighbors(current):
                     try:
                         peso = graph.get_edge_data(current, adj)['peso']
+                        print(peso)
                         frontier.put((priority + peso, (adj, path + [adj])))
                     except KeyError:
                         pass
@@ -282,24 +283,28 @@ def DF_branch_and_bound(graph, start, goal, node_labels):
 
 
 
-G, node_labels, edge_labels = generate_labeled_directed_graph_h()
-print(node_labels)
-path = ['A', 'B', 'E']
-costo_percorso = get_cost(G, path)
-euristica = get_heuristic(path[-1], node_labels)
-f = get_f(G, path, node_labels)
+def prova_informed():
+    G, node_labels, edge_labels = generate_labeled_directed_graph_h()
+    print(node_labels)
+    path = ['A', 'B', 'E']
+    costo_percorso = get_cost(G, path)
+    euristica = get_heuristic(path[-1], node_labels)
+    f = get_f(G, path, node_labels)
 
-print("Costo del percorso:", costo_percorso)
-print("Euristica:", euristica)
-print("F:", f)
+    print("Costo del percorso:", costo_percorso)
+    print("Euristica:", euristica)
+    print("F:", f)
 
-node_positions = {'A': (0, 0), 'B': (0, 1), 'C': (-1, 0), 'D': (2, 0),
-                      'E': (0.5, 2),
-                      'F': (2, 1),
-                      'G': (3, 3), 'H': (3, 1), 'J': (-0.5, 2)}
+    node_positions = {'A': (0, 0), 'B': (0, 1), 'C': (-1, 0), 'D': (2, 0),
+                          'E': (0.5, 2),
+                          'F': (2, 1),
+                          'G': (3, 3), 'H': (3, 1), 'J': (-0.5, 2)}
 
-draw_labeled_directed_graph_h(G, node_labels=node_labels, edge_labels=edge_labels, pos = node_positions)
+    draw_labeled_directed_graph_h(G, node_labels=node_labels, edge_labels=edge_labels, pos = node_positions)
 
-print(AStarSearch(G, 'A', 'G', node_labels))
-print(DF_branch_and_bound(G, 'A', 'G', node_labels))
-print("finito")
+    print(AStarSearch(G, 'A', 'G', node_labels))
+    print(DF_branch_and_bound(G, 'A', 'G', node_labels))
+    print("finito")
+
+if __name__ == '__main__':
+    prova_informed()
