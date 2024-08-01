@@ -47,13 +47,13 @@ def dpSearch(graph, goal):
 
     return cost_to_goal
 
+if __name__ == '__main__':
+    G, node_labels, edge_labels = graph.generate_labeled_directed_graph_h()
 
-G, node_labels, edge_labels = graph.generate_labeled_directed_graph_h()
+    #dpsearch funziona con il grafo invertito
+    GReverse = G.reverse()
 
-#dpsearch funziona con il grafo invertito
-GReverse = G.reverse()
+    print(dpSearch(GReverse, 'G'))
 
-print(dpSearch(GReverse, 'G'))
-
-# ORA PER OTTENERE IL VALORE PER COST_TO_GOAL DOVE IL GOAL E' CIASCUN NODO BASTA CICLARE IL METODO SU
-# QUALSIASI NODO SETTANDOLO COME GOAL E IN QUESTA MANIERA OTTENERE IL DB PATTERN CHE MI SERVE
+    # ORA PER OTTENERE IL VALORE PER COST_TO_GOAL DOVE IL GOAL E' CIASCUN NODO BASTA CICLARE IL METODO SU
+    # QUALSIASI NODO SETTANDOLO COME GOAL E IN QUESTA MANIERA OTTENERE IL DB PATTERN CHE MI SERVE

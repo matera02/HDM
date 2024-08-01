@@ -4,6 +4,7 @@ from src.graph.stanza import Stanza
 import src.graph.graph as gr
 from queue import PriorityQueue
 import sys
+import src.graph.dynprog as dp
 
 
 def get_node(na, nodes):
@@ -542,7 +543,54 @@ def prova_informed():
     #l'unica modifica a df branch and bround dovrebbe essere quella di togliere nodelabels
     print("Path trovato: ", DF_branch_and_bound(g1, start, goal))
 
+# va modificata pure dpSearch per funzionare con oggetti Stanza
+def dpSearch(graph, goal):
+    print("DP SEARCH: ")
+    frontier = PriorityQueue()
+    visited = set()
+    cost_to_goal = {}
+    goal_id = goal.get_id()  # Assicurati che 'goal' sia un oggetto Stanza
+
+    # Inizializzo a infinito il valore di cost_to_goal per ciascun nodo
+    for node in graph.nodes:
+        node_id = node.get_id()  # Ottiene l'ID dell'oggetto Stanza
+        if node_id != goal_id:
+            cost_to_goal[node_id] = float('inf')
+    cost_to_goal[goal_id] = 0
+
+    # Aggiungo il nodo di partenza alla coda di priorità
+    frontier.put((0, goal_id, [goal_id]))  # Cambiato per gestire ID invece di oggetti
+
+    while not frontier.empty():
+        priority, current_id, path = frontier.get()
+        print(priority, path)
+        print(current_id)
+
+        if current_id not in visited:
+            visited.add(current_id)
+            current = get_node(current_id, graph.nodes)  # Recupera l'oggetto Stanza usando l'ID
+
+            for adj in graph.neighbors(current):
+                adj_id = adj.get_id()  # Ottiene l'ID del nodo adiacente
+                peso = graph.get_edge_data(current, adj)['peso']
+                new_cost = cost_to_goal[current_id] + peso
+                if new_cost < cost_to_goal[adj_id]:
+                    cost_to_goal[adj_id] = new_cost
+                    frontier.put((new_cost, adj_id, path + [adj_id]))  # Usa ID nel percorso
+
+    return cost_to_goal
+
+
+
+
+def prova_dp():
+    g1, n1, e1 = get_piano1_pesato()
+    goal = get_node(127, n1)
+    gRev = g1.reverse()
+    print(dpSearch(gRev, goal))
+
 if __name__ == '__main__':
     #prova1()
     #provalcfs()
-    prova_informed()
+    #prova_informed()
+    prova_dp()
