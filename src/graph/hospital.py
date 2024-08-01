@@ -132,6 +132,8 @@ def get_piano1():
         get_edge("Nit. 1", "Store 1", nodes),
         get_edge("Nit. 2", "Store 2", nodes),
         get_edge("Darkroom", "X-ray", nodes),
+        #aggiungo come collegamento da 115 a 116 per non avere un'isola
+        get_edge("Operatory 10", "Darkroom", nodes)
 
         # fai attenzione al grafico
         #get_edge("Operatory 4", "Storage", nodes)
@@ -154,10 +156,10 @@ def get_piano1():
     G.add_edges_from(edges)
 
     # Plot del grafo diretto
-    #plt.figure(figsize=(20, 20))
-    #nx.draw(G, pos, with_labels=True, node_size=500, node_color="skyblue", font_size=10, font_weight="bold", edge_color="gray", arrows=True)
-    #plt.title("1° piano")
-    #plt.show()
+    plt.figure(figsize=(20, 20))
+    nx.draw(G, pos, with_labels=True, node_size=500, node_color="skyblue", font_size=10, font_weight="bold", edge_color="gray", arrows=True)
+    plt.title("1° piano")
+    plt.show()
 
     return G, nodes, edges
 
@@ -244,7 +246,18 @@ def get_piano2():
         get_edge("Entry", "Guest Room", nodes2),
         get_edge("Entry", "Office 1", nodes2), 
         get_edge("Entry", "Study Library", nodes2),
-        get_edge("Storage Room", "Stairs", nodes2)
+        get_edge("Storage Room", "Stairs", nodes2),
+        # Le seguenti sono aggiunte per rimuovere altre isole
+        get_edge(203, 217, nodes2), 
+        get_edge(204, 218, nodes2),
+        get_edge(205, 219, nodes2),
+        get_edge(219, 225, nodes2),
+        get_edge(220, 223, nodes2),
+        get_edge(221, 224, nodes2),
+        get_edge(222, 226, nodes2),
+        get_edge(228, 229, nodes2),
+        get_edge(230, 232, nodes2),
+        get_edge(227, 231, nodes2) 
     ]
 
     # Aggiungo gli archi al grafo
@@ -254,10 +267,10 @@ def get_piano2():
     pos2 = get_positions(nodes2)
 
     # Plot del grafo
-    #plt.figure(figsize=(20, 20))
-    #nx.draw(G2, pos2, with_labels=True, node_size=500, node_color="skyblue", font_size=10, font_weight="bold", edge_color="gray", arrows=True)
-    #plt.title("2° Piano")
-    #plt.show()
+    plt.figure(figsize=(20, 20))
+    nx.draw(G2, pos2, with_labels=True, node_size=500, node_color="skyblue", font_size=10, font_weight="bold", edge_color="gray", arrows=True)
+    plt.title("2° Piano")
+    plt.show()
     return G2, nodes2, edges2
 
 def get_piano3():
@@ -265,11 +278,11 @@ def get_piano3():
 
     # Definisco tutti i nodi e le connessioni
     nodes3 = [
-        Stanza(301, "Supply Closet", 6, 0.7, 3), 
+        Stanza(301, "Entry", 1, 0, 3), 
         Stanza(302, "Minor Procedures", 5, -0.5, 3),
         Stanza(303, "Exam 1", 6, 0.3, 3),
         Stanza(304, "Exam 2", 7, 0.3, 3),
-        Stanza(305, "Exam 3", 8, 0.3, 3),
+        Stanza(305, "Exam 3", 7, -0.3, 3),
         Stanza(306, "Drug/Supply", 4, -0.5, 3),
         Stanza(307, "Doctor Office 1", 3, -0.5, 3),
         Stanza(308, "Waiting Area", 2, 0, 3),
@@ -283,7 +296,7 @@ def get_piano3():
         Stanza(316, "Multi-Purpose", 6, -1, 3),
         Stanza(317, "X-ray Suite", 7, -1, 3),
         Stanza(318, "Control Area", 8, -1, 3),
-        Stanza(319, "Entry", 1, 0, 3),
+        Stanza(319, "Supply Closet", 6, 0.7, 3),
         Stanza(320, "Stairs", 9, -1, 3)
     ]
 
@@ -306,7 +319,17 @@ def get_piano3():
         get_edge("Multi-Purpose", "X-ray Suite", nodes3),
         get_edge("X-ray Suite", "Control Area", nodes3),
         get_edge("Control Area", "Stairs", nodes3),
-        get_edge("Supply Closet", "Exam 1", nodes3)  
+        get_edge("Supply Closet", "Exam 1", nodes3),
+        # Aggiunta nodi per rimozioni isole
+        get_edge(311, 319, nodes3),
+        get_edge(302, 316, nodes3),
+        # Ulteriori aggiunte
+        get_edge(309, 307, nodes3),
+        get_edge(318, 302, nodes3),
+        get_edge(304, 319, nodes3),
+        get_edge(312, 319, nodes3),
+        get_edge(313, 306, nodes3),
+        get_edge(305, 312, nodes3)
     ]
 
     pos3 = get_positions(nodes3)
@@ -317,10 +340,10 @@ def get_piano3():
     G3.add_edges_from(edges3)
 
     # Plotting the graph with accurate node positions
-    #plt.figure(figsize=(15, 10))
-    #nx.draw(G3, pos3, with_labels=True, node_color='skyblue', node_size=500, arrowstyle='-|>', arrowsize=20)
-    #plt.title("3° Piano")
-    #plt.show()
+    plt.figure(figsize=(15, 10))
+    nx.draw(G3, pos3, with_labels=True, node_color='skyblue', node_size=500, arrowstyle='-|>', arrowsize=20)
+    plt.title("3° Piano")
+    plt.show()
     return G3, nodes3, edges3
 
 def get_piano1_pesato():
@@ -577,11 +600,7 @@ def dpSearch(graph, goal):
                 if new_cost < cost_to_goal[adj_id]:
                     cost_to_goal[adj_id] = new_cost
                     frontier.put((new_cost, adj_id, path + [adj_id]))  # Usa ID nel percorso
-
     return cost_to_goal
-
-
-
 
 def prova_dp():
     g1, n1, e1 = get_piano1_pesato()
