@@ -2,6 +2,8 @@
 import networkx as nx
 from collections import deque
 import src.graph.hospital as hp
+import src.graph.graph as gr
+import src.graph.island as isl
 
 def bfs(graph, start_node):
     queue = deque([start_node])
@@ -43,7 +45,7 @@ def criterio_piano(nodo, vicino):
 
 
 def provaIsole():
-    g1, n1, e1 = hp.get_piano1()
+    g1, n1, e1 = hp.get_piano1_pesato()
     g2, n2, e2 = hp.get_piano2()
     g3, n3, e3 = hp.get_piano3()
     
@@ -66,6 +68,20 @@ def provaIsole():
     print("Isole basate sul piano dei nodi: \n")
     for isola in isole_piano:
         print(isola)
+
+
+    subgraphs = isl.sottografi_da_isole(g, isole_piano)
+
+    print(len(isole_piano), "\n")
+    x = hp.get_node(101, g.nodes())
+    print("LCFS - PIANO 1: ", hp.lowestCostSearch(subgraphs[0], x, a))
+    print("nodi piano 2: ", subgraphs[1].nodes())
+    print("DFS - PIANO 2: ", gr.dfs(subgraphs[1], b, c))
+    start = hp.get_node(301, g.nodes())
+    goal = hp.get_node(320, g.nodes())
+    print("BFS - PIANO 3: ", gr.bfs(subgraphs[2], start, goal))
+
+    
 
 
 if __name__ == '__main__':
