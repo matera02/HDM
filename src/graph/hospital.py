@@ -6,6 +6,7 @@ from queue import PriorityQueue
 import sys
 import src.graph.dynprog as dp
 import mplcursors
+from src.util.utility import Utility as util
 
 
 def get_node(na, nodes):
@@ -44,59 +45,11 @@ def get_f(graph, path):
     return costo + get_heuristic(path[-1])
 
 
-
 def get_positions(nodes):
     positions = {}
     for node in nodes:
         positions[node] = node.get_pos()
     return positions
-
-def get_node_by_position(pos, x, y):
-    for node, (px, py) in pos.items():
-        if abs(px - x) < 0.1 and abs(py - y) < 0.1:
-            return node
-    return None
-
-def save_positions_to_file(positions, filename="node_positions.txt"):
-    with open(filename, "w") as f:
-        for node, (x, y) in positions.items():
-            f.write(f"{node.get_id()} {node.tipo} {x} {y}\n")
-
-def plot_and_interact_graph(G, pos, title, filename="node_positions.txt"):
-    fig, ax = plt.subplots(figsize=(20, 20))
-    nx.draw(G, pos, with_labels=True, node_size=500, node_color="skyblue", font_size=10, font_weight="bold", edge_color="gray", arrows=True, ax=ax)
-    plt.title(title)
-
-    dragged_node = None
-
-    def on_press(event):
-        nonlocal dragged_node
-        if event.inaxes == ax:
-            dragged_node = get_node_by_position(pos, event.xdata, event.ydata)
-
-    def on_release(event):
-        nonlocal dragged_node
-        dragged_node = None
-
-    def on_motion(event):
-        if dragged_node is not None:
-            pos[dragged_node] = (event.xdata, event.ydata)
-            ax.clear()
-            nx.draw(G, pos, with_labels=True, node_size=500, node_color="skyblue", font_size=10, font_weight="bold", edge_color="gray", arrows=True, ax=ax)
-            plt.title(title)
-            fig.canvas.draw()
-
-    def on_close(event):
-        save_positions_to_file(pos, filename)
-
-    fig.canvas.mpl_connect('button_press_event', on_press)
-    fig.canvas.mpl_connect('button_release_event', on_release)
-    fig.canvas.mpl_connect('motion_notify_event', on_motion)
-    fig.canvas.mpl_connect('close_event', on_close)
-
-    plt.show()
-
-
 
 # assumo che sia diretto da a a b 
 def get_edge(na, nb, nodes):
@@ -120,6 +73,7 @@ def get_positions(nodes):
 def get_piano1():
 
     # Definisco i nodi
+    """"
     nodes = [
         Stanza(101, "Entry", 5, 10, 1),
         Stanza(102, "Reception Room New Patient", 4, 9, 1),
@@ -150,6 +104,11 @@ def get_piano1():
         Stanza(127, "Store 1", 8, 6, 1),
         Stanza(128, "Store 2", 7, 5, 1),
         Stanza(129, "Break Room", 6, 8, 1)
+    ]"""
+    node_positions = util.get_positions_from_file("src/graph/data/node_positions_piano1.txt")
+    nodes = [
+        Stanza(node_id, tipo, x, y, 1)
+        for node_id, (tipo, x, y) in node_positions.items()
     ]
 
     # Definisco gli archi
@@ -210,7 +169,7 @@ def get_piano1():
     G.add_edges_from(edges)
 
     # Plot del grafo diretto
-    plot_and_interact_graph(G, pos, "1° piano", "src/graph/data/node_positions_P1.txt")
+    util.plot_and_interact_graph(G, pos, "1° piano", "src/graph/data/node_positions_P1.txt")
 
     return G, nodes, edges
 
@@ -318,7 +277,7 @@ def get_piano2():
     pos2 = get_positions(nodes2)
 
     # Plot del grafo
-    plot_and_interact_graph(G2, pos2, "2° Piano", "src/graph/data/node_positions_P2.txt")
+    util.plot_and_interact_graph(G2, pos2, "2° Piano", "src/graph/data/node_positions_P2.txt")
     return G2, nodes2, edges2
 
 def get_piano3():
@@ -388,7 +347,7 @@ def get_piano3():
     G3.add_edges_from(edges3)
 
     # Plotting the graph with accurate node positions
-    plot_and_interact_graph(G3, pos3, "3° Piano", "src/graph/data/node_positions_P3.txt")
+    util.plot_and_interact_graph(G3, pos3, "3° Piano", "src/graph/data/node_positions_P3.txt")
     return G3, nodes3, edges3
 
 def get_piano1_pesato():
