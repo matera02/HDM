@@ -125,8 +125,8 @@ def lowestCostSearch(graph, start, goal):
             if current in graph:
                 for adj in graph.neighbors(current):
                     try:
-                        peso = graph.get_edge_data(current, adj)['peso']
-                        print(peso)
+                        # cambiato da peso a weight
+                        peso = graph.get_edge_data(current, adj)['weight']
                         frontier.put((priority + peso, (adj, path + [adj])))
                     except KeyError:
                         pass
