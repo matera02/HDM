@@ -115,6 +115,80 @@ class GrafoStanze:
         else:
             print(f"Stanza con numero {numero_stanza} non trovata nel grafo.")
             return None
+        
+
+# dfs con cycle pruning e multiple path pruning
+def dfs_pruning(graph, start, goal):
+    print('DFS: ')
+    frontier = [(start, [start])]
+    visited = set()  # Per il cycle pruning
+    
+    while frontier:
+        current, path = frontier.pop()
+        
+        if current == goal:
+            return path
+        
+        if current not in visited:
+            visited.add(current)
+            
+            for adj in graph.neighbors(current):
+                if adj not in path:  # Multiple path pruning
+                    new_path = path + [adj]
+                    print((adj, new_path))
+                    frontier.append((adj, new_path))
+    
+    return None
+
+from queue import PriorityQueue
+
+def AStarSearch_MPP(graph, start, goal, node_labels):
+    print('AStar Search with Multiple Path Pruning: ')
+    frontier = PriorityQueue()
+    visited = {}  # Dizionario per tenere traccia dei nodi visitati e dei loro costi
+    g_costs = {start: 0}  # Dizionario per i costi g
+    priority = get_f(graph, start, node_labels)
+    frontier.put((priority, start))
+    came_from = {}  # Dizionario per ricostruire il percorso
+
+    while not frontier.empty():
+        current_f, current = frontier.get()
+
+        if current == goal:
+            return reconstruct_path(came_from, start, goal)
+
+        if current in visited and visited[current] <= current_f:
+            continue
+
+        visited[current] = current_f
+
+        if current in graph:
+            for adj in graph.neighbors(current):
+                new_g = g_costs[current] + graph[current][adj]['weight']
+                if adj not in g_costs or new_g < g_costs[adj]:
+                    g_costs[adj] = new_g
+                    f = new_g + get_h(adj, goal, node_labels)
+                    frontier.put((f, adj))
+                    came_from[adj] = current
+        else:
+            print(f"Il nodo {current} non è presente nel grafo.")
+
+    return None
+
+def get_f(graph, node, node_labels):
+    # Implementa questa funzione per calcolare f = g + h
+    pass
+
+def get_h(node, goal, node_labels):
+    # Implementa questa funzione per calcolare l'euristica h
+    pass
+
+def reconstruct_path(came_from, start, goal):
+    path = [goal]
+    while path[-1] != start:
+        path.append(came_from[path[-1]])
+    path.reverse()
+    return path
 
 
 
@@ -138,4 +212,19 @@ if __name__ == "__main__":
 
     # HO RISOLTO IL PROBLEMA CHE AVEVO IERI CON I NODI CHE ERANO OGGETTO
     # ORA PER FARE RIFERIMENTO AD UN NODO MI BASTA IL NUMERO DEL NODO
-    gr.lowestCostSearch(G, 101, 124)
+    path_bfs = gr.bfs(G, 101, 320)
+    #path_dfs = gr.dfs(G, 101, 202)
+    path_id = gr.IterativeDeepening(G, 101, 320)
+    path_lcfs = gr.lowestCostSearch(G, 101, 202)
+
+    print("Path trovato bfs: ", path_bfs, "\n")
+
+    #print("Path trovato dfs: ", path_dfs, "\n")
+
+    print("Path trovato id: ", path_id, "\n")
+    print("Path trovato lcfs: ", path_lcfs, "\n")
+
+
+    # DEVO PREVEDERE UNA STRATEGIA DI PATH PRUNING e CYCLE PRUNING PER DFS
+    path_dfs = dfs_pruning(G, 101, 320)
+    print("Path trovato dfs: ", path_dfs, "\n")
