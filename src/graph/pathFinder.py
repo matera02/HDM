@@ -193,8 +193,10 @@ class PathFinder:
         return costo + heuristic
     
     @staticmethod
-    def AStarSearch(prolog, graph, start, goal):
+    def AStarSearch(graph, start, goal):
         print('AStar Search: ')
+        prolog = Prolog()
+        prolog.consult(filename=FILENAME)
         frontier = PriorityQueue()
         best_costs = {}  # Dizionario per tenere traccia del miglior costo per ogni nodo
         start_priority = PathFinder.__get_f(prolog, graph, [start], goal)
@@ -225,8 +227,11 @@ class PathFinder:
     
     @staticmethod
     # aggiunto meccanismo di cycle pruning e multiple path pruning
-    def DF_branch_and_bound(prolog, graph, start, goal):
+    def DF_branch_and_bound(graph, start, goal):
         print("DF Branch and Bound Search:")
+        
+        prolog = Prolog()
+        prolog.consult(filename=FILENAME)
 
         def cbsearch(graph, path, goal, bound, frontier, visited):
             current = path[-1]
@@ -282,22 +287,20 @@ if __name__ == '__main__':
     path_dfs = PathFinder.dfs(G, 101, 320)
     path_id = PathFinder.IterativeDeepening(G, 101, 320)
     path_lcfs = PathFinder.lowestCostSearch(G, 101, 320)
-    print("Path trovato bfs: ", path_bfs, "\n")
-    print("Path trovato dfs: ", path_dfs, "\n")
-    print("Path trovato id: ", path_id, "\n")
-    print("Path trovato lcfs: ", path_lcfs, "\n")
 
     # QUESTO METODO È DA SISTEMARE PERCHÉ AGGIUNGE
     # INDIPENDENTEMENTE DAL FATTO SE SONO PRESENTI O MENO
     
     #PathFinder.make_graph_heuristics()
 
-    prolog = Prolog()
-    prolog.consult(filename=FILENAME)
-
-    path_astar = PathFinder.AStarSearch(prolog, G, 101, 320)
-    print("Path trovato da AStar: ", path_astar, "\n")
-
-    path_dfbb = PathFinder.DF_branch_and_bound(prolog, G, 101, 320)
-    print("Path trovato da DFBB", path_dfbb, "\n")
+    path_astar = PathFinder.AStarSearch(G, 101, 320)
     
+
+    path_dfbb = PathFinder.DF_branch_and_bound(G, 101, 320)
+
+    print("Path trovato bfs: ", path_bfs, "\n")
+    print("Path trovato dfs: ", path_dfs, "\n")
+    print("Path trovato id: ", path_id, "\n")
+    print("Path trovato lcfs: ", path_lcfs, "\n")
+    print("Path trovato da AStar: ", path_astar, "\n")
+    print("Path trovato da DFBB", path_dfbb, "\n")
