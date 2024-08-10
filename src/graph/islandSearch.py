@@ -5,54 +5,61 @@ from src.util.utility import Utility as util
 from src.graph.pathFinder import PathFinder
 import itertools
 from pyswip import Prolog
+import time
 
 FILENAME = 'src/graph/data/hospital.pl'
 
 class IDGS:
     # i nodi goal delle isole con cui abbiamo a che fare sono quelli che 
     # rappresentano le scale per salire di piano in piano
-    def __init__(self, graph=Hospital.get_hospital(), search_algorithm = 'bfs', islands_goals={1:124,2:202,3:320}):
+    def __init__(self, graph=Hospital.get_hospital(), islands_goals={1:124,2:202,3:320}):
         self.graph = graph
-        self.search_algorithm = search_algorithm
+        # faccio il partizionamento in inizializzazione per risparmiare poi in esecuzione
+        # cioè quando chiamo island_driven_graph_search
+        self.islands = self.partition_graph(self.graph)
         self.islands_goals = islands_goals
 
-    def island_driven_graph_search(self, start, goal):
-        # Inizializzazione
-        islands = self.partition_graph(self.graph)
-        
-        #i = 1
-        #for isl in islands:
-        #    print(f"{i}\t", isl)
-        #    i += 1
-
+    def island_driven_graph_search(self, start, goal, search_algorithm='bfs'):
+        start_time = time.time()
         local_paths = []
+        paths_explored = 0
+        nodes_visited = 0
+        current_start = start
+        visited_islands = set()
 
-        # Ricerca nelle isole
-        for island in islands:
-            print("start=", start)
-            print("goal=",goal)
-            local_path, is_same_floor, end_node = self.search(island, start, goal)
-            local_paths.append(local_path)
-            # se non sono sullo stesso piano vuol dire che il goal restituito è quello
-            # del piano su cui ho fatto la ricerca, quindi devo aggiornare il nodo
-            # di partenza goal è sempre lo stesso
-            if not is_same_floor:
-                # il vicino è uno come scelta progettuale
-                try:
-                    print("end_node=", end_node)
-                    #print("Vicini: ", )
-                    start = list(self.graph.neighbors(end_node))[-1] # le scale sono collegate all'entrata di un piano
-                    print("start=",start)
-                except StopIteration:
-                    print("Il nodo goal non ha adiacenti")
-            else:
-                # se sono sullo stesso piano ha trovato il percorso
-                break
-        
-        # Unione dei risultati
+        while current_start != goal:
+            found_path = False
+            for island in self.islands:
+                island_id = id(island)  # Uso l'id dell'oggetto come identificatore unico
+                if current_start in island and island_id not in visited_islands:
+                    visited_islands.add(island_id)
+                    current_goal = goal if goal in island else self.islands_goals[util.get_room_from_graph(self.graph, current_start).floor]
+                    result = self.search(island, current_start, current_goal, search_algorithm)
+
+                    if result is not None:
+                        local_path, is_same_floor, end_node, local_paths_explored, local_nodes_visited = result
+                        local_paths.append(local_path)
+                        paths_explored += local_paths_explored
+                        nodes_visited += local_nodes_visited
+
+                        if is_same_floor and end_node == goal:
+                            return self.__integrate_local_paths(local_paths), paths_explored, nodes_visited, time.time() - start_time
+                        else:
+                            # Aggiorno il nodo di partenza per la prossima iterazione
+                            neighbors = list(self.graph.neighbors(end_node))
+                            if neighbors:
+                                current_start = neighbors[-1]  # le scale sono collegate all'entrata di un piano
+                                found_path = True
+                                break
+                            else:
+                                print(f"Il nodo {end_node} non ha adiacenti")
+                                return None
+
+            if not found_path:
+                print(f"Nessun percorso trovato da {current_start} a {goal}")
+                return None
         final_path = self.__integrate_local_paths(local_paths)
-
-        return final_path
+        return final_path, paths_explored, nodes_visited, time.time() - start_time
     
     # Criterio basato sul piano dei nodi, direttamente da oggetti Room
     def __floor_criterion(self, node, neighbor):
@@ -91,7 +98,7 @@ class IDGS:
         islands = divide_into_islands(self.graph, self.__floor_criterion)
         return get_subgraphs_from_islands(self.graph, islands) #restituisco i sottografi isole
 
-    def search(self, island, start, goal):
+    def search(self, island, start, goal, search_algorithm):
         # Implementazione della ricerca locale all'interno di un'isola
         
         # controllo se i nodi si trovano sullo stesso piano
@@ -101,26 +108,35 @@ class IDGS:
         if not is_same_floor:
             # in questo caso devo considerare tutto il grafo per il controllo
             goal = self.islands_goals[util.get_room_from_graph(self.graph, start).floor]
-        
+
+        # ulteriore controllo se la ricerca dovesse andare nel verso opposto
+        if start not in island:
+            print(f"Il nodo {start} non è presente nell'isola corrente.")
+            return None
+
         # devo considerare l'isola ora
         print("goal=", goal)
-        match self.search_algorithm:
+        match search_algorithm:
+            # il tempo di esecuzione viene gestito in isldgs
             case 'bfs':
-                path = PathFinder.bfs(island, start, goal)
+                result = PathFinder.bfs(island, start, goal)
             case 'dfs':
-                path = PathFinder.dfs(island, start, goal)
+                result = PathFinder.dfs(island, start, goal)
             # iterative deepening
             case 'id':
-                path = PathFinder.IterativeDeepening(island, start, goal)
+                result = PathFinder.IterativeDeepening(island, start, goal)
             case 'lcfs':
-                path = PathFinder.lowestCostSearch(island, start, goal)
+                result = PathFinder.lowestCostSearch(island, start, goal)
             case 'astar':
-                path = PathFinder.AStarSearch(island, start, goal)
+                result = PathFinder.AStarSearch(island, start, goal)
             case 'dfbb':
-                path = PathFinder.DF_branch_and_bound(island, start, goal)
+                result = PathFinder.DF_branch_and_bound(island, start, goal)
             case _:
                 path = None
-        return path, is_same_floor, goal
+        if result is None:
+            return None
+        path, paths_explored, nodes_visited, _ = result
+        return path, is_same_floor, goal, paths_explored, nodes_visited
 
     
     def __integrate_local_paths(self, local_paths):
@@ -129,10 +145,10 @@ class IDGS:
 
 
 if __name__ == '__main__':
-    isl = IDGS(search_algorithm='dfbb')
+    isl = IDGS()
     start = 101
     goal = 320
-    path = isl.island_driven_graph_search(start, goal)
+    path, _, _, _ = isl.island_driven_graph_search(start, goal)
     print("Path trovato: ", path)
 
 
