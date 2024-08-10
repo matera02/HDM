@@ -265,7 +265,8 @@ if __name__ == '__main__':
     #paths_required = 0
     #for start in G.nodes():
     #    for goal in G.nodes():
-    #        paths_required += 1
+    #        if start != goal: 
+    #           paths_required += 1
     #print("Path richiesti: ", paths_required)
 #
     #check_solutions_found(

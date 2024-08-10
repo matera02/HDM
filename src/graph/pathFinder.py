@@ -255,11 +255,11 @@ class PathFinder:
         return costo + heuristic
     
     @staticmethod
-    def AStarSearch(graph, start, goal):
+    def AStarSearch(graph, start, goal, filename=FILENAME):
         print('AStar Search: ')
         start_time = time.time()
         prolog = Prolog()
-        prolog.consult(filename=FILENAME)
+        prolog.consult(filename=filename)
         frontier = PriorityQueue()
         best_costs = {}
         start_priority = PathFinder.__get_f(prolog, graph, [start], goal)
@@ -299,11 +299,11 @@ class PathFinder:
 
     @staticmethod
     # aggiunto meccanismo di cycle pruning e multiple path pruning
-    def DF_branch_and_bound(graph, start, goal):
+    def DF_branch_and_bound(graph, start, goal, filename=FILENAME):
         print("DF Branch and Bound Search:")
         start_time = time.time()
         prolog = Prolog()
-        prolog.consult(filename=FILENAME)
+        prolog.consult(filename=filename)
         paths_explored = 0
         nodes_visited = 0
 
