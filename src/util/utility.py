@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 
 # UTILITÀ PER CSP
@@ -185,3 +186,83 @@ class Utility:
         else:
             print(f"Stanza con numero {room_number} non trovata nel grafo.")
             return None
+        
+    @staticmethod
+    # Funzione per salvare i dati in un unico file
+    def save_params_to_pickle(nodes_visited, paths_explored, times, filename):
+        data_dict = {
+            'nodes_visited':nodes_visited,
+            'paths_explored':paths_explored,
+            'times':times
+        }
+        with open(filename, 'wb') as f:
+            pickle.dump(data_dict, f)
+        print(f"Tutti i dati sono stati salvati in {filename}")
+
+    @staticmethod
+    # Per la valutazione degli algoritmi sui grafi
+    # Algoritmi con e senza idgs
+    def load_params_from_pickle(filename):
+        with open(filename, 'rb') as f:
+            data_dict = pickle.load(f)
+        print(f"Tutti i dati sono stati caricati da {filename}")
+        return data_dict['nodes_visited'], data_dict['paths_explored'], data_dict['times']    
+
+    # Utilità sia per graph che per csp
+    @staticmethod
+    def plot_cumulative_execution_times(times_dict, savefig):
+        # Creo il grafico
+        plt.figure(figsize=(10, 6))
+
+        # Itero sui dati, calcolo la somma cumulativa e plotto ciascuna lista di tempi di esecuzione
+        for label, times in times_dict.items():
+            cumulative_times = np.cumsum(times)
+            esempi = list(range(1, len(cumulative_times) + 1))
+            plt.plot(esempi, cumulative_times, marker='o', label=label)
+
+        # Aggiungo le etichette e la leggenda
+        plt.title('Somma Cumulativa dei Tempi di Esecuzione per Numero di Esempio')
+        plt.xlabel('Numero di Esempio')
+        plt.ylabel('Somma Cumulativa del Tempo di Esecuzione (s)')
+        plt.legend()
+
+        # Salvo il plot come immagine
+        plt.savefig(savefig)
+
+        # Mostro il grafico
+        plt.show()
+
+    @staticmethod
+    def get_execution_time_stats(times_dict, savefig):
+
+        # Creo una lista per memorizzare i dati delle statistiche
+        data = []
+
+        # Itero sui dati per calcolare le statistiche
+        for label, times in times_dict.items():
+            mean_time = round(np.mean(times), 3)
+            min_time = round(np.min(times), 3)
+            max_time = round(np.max(times), 3)
+            data.append([label, mean_time, min_time, max_time])
+
+        # Creo un DataFrame con i dati
+        df = pd.DataFrame(data, columns=['Algoritmo', 'Tempo Medio (s)', 'Tempo Minimo (s)', 'Tempo Massimo (s)'])
+
+        fig, ax = plt.subplots(figsize=(10, 4))  # Imposto la dimensione della figura
+        ax.axis('tight')
+        ax.axis('off')
+
+        # Creo la tabella
+        table = ax.table(cellText=df.values, colLabels=df.columns, cellLoc='center', loc='center')
+
+        # Formatto la tabella
+        table.auto_set_font_size(False)
+        table.set_fontsize(10)
+        table.scale(1.2, 1.2)
+
+        plt.title('Statistiche dei Tempi di Esecuzione')
+
+        # Salvo la tabella
+        plt.savefig(savefig)
+
+        plt.show()

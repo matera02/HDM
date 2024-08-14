@@ -13,7 +13,7 @@ class PathFinder:
     @staticmethod
     # dfs con cycle pruning e multiple path pruning
     def dfs(graph, start, goal):
-        print('DFS: ')
+        #print('DFS: ')
         start_time = time.time()
         frontier = [(start, [start])]
         visited = set()  # Per il cycle pruning
@@ -35,7 +35,7 @@ class PathFinder:
                     if adj not in path:  # Multiple path pruning
                         new_path = path + [adj]
                         paths_explored += 1
-                        print((adj, new_path))
+                        #print((adj, new_path))
                         frontier.append((adj, new_path))
 
         return None
@@ -44,7 +44,7 @@ class PathFinder:
     # in questo caso non era necessario implementare
     # un meccanismo di pruning
     def bfs(graph, start, goal):
-        print('BFS: ')
+        #print('BFS: ')
         start_time = time.time()
         frontier = Queue()
         visited = set()
@@ -67,7 +67,7 @@ class PathFinder:
                 for adj in graph.neighbors(current):
                     if adj not in path: #mpp
                         paths_explored += 1
-                        print((adj, path + [adj]))
+                        #print((adj, path + [adj]))
                         frontier.put((adj, path + [adj]))
         
         return None
@@ -75,7 +75,7 @@ class PathFinder:
 
     @staticmethod
     def IterativeDeepening(graph, start, goal, max_bound = None):
-        print('Iterative Deepening: ')
+        #print('Iterative Deepening: ')
         start_time = time.time()
     
         def DepthLimitedSearch(graph, node, goal, bound, path, paths_explored, nodes_visited, visited):
@@ -123,7 +123,7 @@ class PathFinder:
 
     @staticmethod
     def lowestCostSearch(graph, start, goal):
-        print('Lowest Cost Search: ')
+        #print('Lowest Cost Search: ')
         start_time = time.time()
         frontier = PriorityQueue()
         visited = set()
@@ -137,7 +137,7 @@ class PathFinder:
         while not frontier.empty():
             priority, (current, path) = frontier.get()
             nodes_visited += 1
-            print(priority, path)
+            #print(priority, path)
 
             if current == goal:
                 t = time.time() - start_time
@@ -256,7 +256,7 @@ class PathFinder:
     
     @staticmethod
     def AStarSearch(graph, start, goal, filename=FILENAME):
-        print('AStar Search: ')
+        #print('AStar Search: ')
         start_time = time.time()
         prolog = Prolog()
         prolog.consult(filename=filename)
@@ -300,7 +300,7 @@ class PathFinder:
     @staticmethod
     # aggiunto meccanismo di cycle pruning e multiple path pruning
     def DF_branch_and_bound(graph, start, goal, filename=FILENAME):
-        print("DF Branch and Bound Search:")
+        #print("DF Branch and Bound Search:")
         start_time = time.time()
         prolog = Prolog()
         prolog.consult(filename=filename)
@@ -335,7 +335,7 @@ class PathFinder:
 
         best_path = None
         while frontier:
-            print(frontier)
+            #print(frontier)
             cost, (current, path) = min(frontier, key=lambda x: x[0])
             frontier.remove((cost, (current, path)))
 
@@ -365,11 +365,12 @@ if __name__ == '__main__':
 
     # QUESTO METODO È DA SISTEMARE PERCHÉ AGGIUNGE
     # INDIPENDENTEMENTE DAL FATTO SE SONO PRESENTI O MENO
-    
-    #PathFinder.make_graph_heuristics()
+    new_file = 'src/graph/data/diGraph/heuristics.pl'
 
-    path_astar, paths_explored_astar, nodes_visited_astar, _ = PathFinder.AStarSearch(G, 101, 320)
-    path_dfbb, paths_explored_dfbb, nodes_visited_dfbb, _ = PathFinder.DF_branch_and_bound(G, 101, 320)
+    #PathFinder.make_graph_heuristics(G=G, filename=new_file)
+
+    path_astar, paths_explored_astar, nodes_visited_astar, _ = PathFinder.AStarSearch(G, 101, 320, filename=new_file)
+    path_dfbb, paths_explored_dfbb, nodes_visited_dfbb, _ = PathFinder.DF_branch_and_bound(G, 101, 320, filename=new_file)
 
     print("Path trovato bfs: ", path_bfs, "\n")
     print("Path trovato dfs: ", path_dfs, "\n")

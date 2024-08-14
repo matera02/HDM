@@ -33,6 +33,11 @@ DIR_GALSCT1_SOLUTIONS = 'src/csp/data/solutions/genetic_algorithm_local_search/c
 DIR_GALSCT2_SOLUTIONS = 'src/csp/data/solutions/genetic_algorithm_local_search/ct2'
 DIR_GALSCT3_SOLUTIONS = 'src/csp/data/solutions/genetic_algorithm_local_search/ct3'
 
+# SAVE FIG CUMULATIVE EXECUTION TIMES
+SAVEFIG_CET = 'src/csp/data/stats/cumulative_execution_times.png'
+# SAVE FIG EXECUTION TIME STATS
+SAVEFIG_ETS = 'src/csp/data/stats/time_stats.png'
+
 
 def get_problem_data(object):
     num_nurses = np.int64(object.getNumNurses())
@@ -267,68 +272,6 @@ def get_times_dict():
     return times_dict
 
 
-def plot_cumulative_execution_times(savefig='src/csp/data/stats/cumulative_execution_times.png'):
-    times_dict = get_times_dict()
-    # Creo il grafico
-    plt.figure(figsize=(10, 6))
-
-    # Itero sui dati, calcolo la somma cumulativa e plotto ciascuna lista di tempi di esecuzione
-    for label, times in times_dict.items():
-        cumulative_times = np.cumsum(times)
-        esempi = list(range(1, len(cumulative_times) + 1))
-        plt.plot(esempi, cumulative_times, marker='o', label=label)
-
-    # Aggiungo le etichette e la leggenda
-    plt.title('Somma Cumulativa dei Tempi di Esecuzione per Numero di Esempio')
-    plt.xlabel('Numero di Esempio')
-    plt.ylabel('Somma Cumulativa del Tempo di Esecuzione (s)')
-    plt.legend()
-
-    # Salvo il plot come immagine
-    plt.savefig(savefig)
-
-    # Mostro il grafico
-    plt.show()
-
-def get_execution_time_stats(savefig='src/csp/data/stats/time_stats.png'):
-    times_dict = get_times_dict()
-    
-    # Creo una lista per memorizzare i dati delle statistiche
-    data = []
-    
-    # Itero sui dati per calcolare le statistiche
-    for label, times in times_dict.items():
-        mean_time = round(np.mean(times), 3)
-        min_time = round(np.min(times), 3)
-        max_time = round(np.max(times), 3)
-        data.append([label, mean_time, min_time, max_time])
-    
-    # Creo un DataFrame con i dati
-    df = pd.DataFrame(data, columns=['Algoritmo', 'Tempo Medio (s)', 'Tempo Minimo (s)', 'Tempo Massimo (s)'])
-
-    fig, ax = plt.subplots(figsize=(10, 4))  # Imposto la dimensione della figura
-    ax.axis('tight')
-    ax.axis('off')
-    
-    # Creo la tabella
-    table = ax.table(cellText=df.values, colLabels=df.columns, cellLoc='center', loc='center')
-
-    # Formatto la tabella
-    table.auto_set_font_size(False)
-    table.set_fontsize(10)
-    table.scale(1.2, 1.2)
-    
-    plt.title('Statistiche dei Tempi di Esecuzione')
-
-    # Salvo la tabella
-    plt.savefig(savefig)
-
-    plt.show()
-
-
-
-
-
 if __name__ == '__main__':
     #NSP.start()
     #process_file_tabu_search("src/csp/NSP/N25/1.nsp", "src/csp/data/solutions/tabu")
@@ -340,8 +283,9 @@ if __name__ == '__main__':
 
     # Box plot di fitness
     get_fitness()
-    plot_cumulative_execution_times()
-    get_execution_time_stats()
+    times_dict = get_times_dict()
+    util.plot_cumulative_execution_times(times_dict=times_dict, savefig=SAVEFIG_CET)
+    util.get_execution_time_stats(times_dict=times_dict, savefig=SAVEFIG_ETS)
 
     #NSP.shutdown()
 
