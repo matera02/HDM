@@ -189,8 +189,9 @@ class Utility:
         
     @staticmethod
     # Funzione per salvare i dati in un unico file
-    def save_params_to_pickle(nodes_visited, paths_explored, times, filename):
+    def save_params_to_pickle(n_paths, nodes_visited, paths_explored, times, filename):
         data_dict = {
+            'n_paths':n_paths,
             'nodes_visited':nodes_visited,
             'paths_explored':paths_explored,
             'times':times
@@ -206,7 +207,7 @@ class Utility:
         with open(filename, 'rb') as f:
             data_dict = pickle.load(f)
         print(f"Tutti i dati sono stati caricati da {filename}")
-        return data_dict['nodes_visited'], data_dict['paths_explored'], data_dict['times']    
+        return data_dict['n_paths'], data_dict['nodes_visited'], data_dict['paths_explored'], data_dict['times']    
 
     # Utilità sia per graph che per csp
     @staticmethod
@@ -240,15 +241,19 @@ class Utility:
 
         # Itero sui dati per calcolare le statistiche
         for label, times in times_dict.items():
-            mean_time = round(np.mean(times), 3)
-            min_time = round(np.min(times), 3)
-            max_time = round(np.max(times), 3)
+            #mean_time = round(np.mean(times), 3)
+            #min_time = round(np.min(times), 3)
+            #max_time = round(np.max(times), 3)
+            mean_time = f"{np.mean(times):.6f}"
+            min_time = f"{np.min(times):.6f}"
+            max_time = f"{np.max(times):.6f}"
             data.append([label, mean_time, min_time, max_time])
 
         # Creo un DataFrame con i dati
         df = pd.DataFrame(data, columns=['Algoritmo', 'Tempo Medio (s)', 'Tempo Minimo (s)', 'Tempo Massimo (s)'])
 
-        fig, ax = plt.subplots(figsize=(10, 4))  # Imposto la dimensione della figura
+        #fig, ax = plt.subplots(figsize=(10, 4))  # Imposto la dimensione della figura
+        fig, ax = plt.subplots(figsize=(12, 4)) # ho aumentato leggermente la larghezza
         ax.axis('tight')
         ax.axis('off')
 
@@ -257,7 +262,8 @@ class Utility:
 
         # Formatto la tabella
         table.auto_set_font_size(False)
-        table.set_fontsize(10)
+        #table.set_fontsize(10)
+        table.set_fontsize(9) # ridotta leggermente la dimensione del font 
         table.scale(1.2, 1.2)
 
         plt.title('Statistiche dei Tempi di Esecuzione')
