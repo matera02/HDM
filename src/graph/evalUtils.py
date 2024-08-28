@@ -7,10 +7,10 @@ import networkx as nx
 class EvaluationUtils:
 
     @staticmethod
-    #aggrego i dati in base al numero di nodi esplorati 
-    # e calcolato la media dei percorsi esplorati all'interno di ciascun intervallo
     def plot_aggregated_data(nodes_visited, paths_explored, savefig):
-
+        # Aggrego i dati in bin (intervalli) di dimensione specificata (default 5)
+        # Calcolo la media dei nodi visitati e dei percorsi esplorati per ogni bin
+        # Restituisco i dati aggregati per nodi e percorsi
         def calculate_aggregated_data(nodes_visited, paths_explored, bin_size=5):
             aggregated_nodes = {}
             aggregated_paths = {}

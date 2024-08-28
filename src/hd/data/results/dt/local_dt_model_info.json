@@ -1,0 +1,13 @@
+{
+    "model_name": "Decision Tree",
+    "params": {
+        "max_depth": 8,
+        "min_samples_split": 20,
+        "min_samples_leaf": 7
+    },
+    "accuracy": 0.7608695652173914,
+    "precision": 0.7711015626207515,
+    "recall": 0.7608695652173914,
+    "f1_score": 0.7627612838672357,
+    "overfitting_analysis": "Il modello sembra ben bilanciato.\nTrain score: media = 0.860938, std = 0.007461\nTest score: media = 0.805000, std = 0.032692\nTrain varianza: 0.000056\nTest varianza: 0.001069\nIl modello sembra stabile sui dati di test."
+}

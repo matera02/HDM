@@ -208,12 +208,10 @@ def make_solutions_files():
     galsct3 = partial(process_file_genetic_algorithm_local_search, algorithm=GALSCT3, crossover_type=CROSSOVER_TYPE_3)
     create_files_to_evaluate(1, 100, source, dest, galsct3)
 
-
 def get_fitness(savefig='src/csp/data/stats/fitness_boxplots.png'):
     key = 'best_fitness'
     title = 'Box Plot dei Valori di Fitness per Algoritmo'
     ylabel = 'Valori di Fitness'
-
     tabu = util.get_items_from_results(DIR_TABU_SOLUTIONS, key)
     gact1 = util.get_items_from_results(DIR_GACT1_SOLUTIONS, key)
     gact2 = util.get_items_from_results(DIR_GACT2_SOLUTIONS, key)
@@ -221,39 +219,54 @@ def get_fitness(savefig='src/csp/data/stats/fitness_boxplots.png'):
     galsct1 = util.get_items_from_results(DIR_GALSCT1_SOLUTIONS, key)
     galsct2 = util.get_items_from_results(DIR_GALSCT2_SOLUTIONS, key)
     galsct3 = util.get_items_from_results(DIR_GALSCT3_SOLUTIONS, key)
-
+    
     # Combino i dati in un unico DataFrame
     data = {
         'Algoritmo': ['TABU']*len(tabu) + ['GACT1']*len(gact1) + ['GACT2']*len(gact2) + ['GACT3']*len(gact3) +
                      ['GALSCT1']*len(galsct1) + ['GALSCT2']*len(galsct2) + ['GALSCT3']*len(galsct3),
         'Valori': tabu + gact1 + gact2 + gact3 + galsct1 + galsct2 + galsct3
     }
-
     df = pd.DataFrame(data)
-
+    
     # Creo il box plot con seaborn
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 8))
     ax = sns.boxplot(x='Algoritmo', y='Valori', data=df)
-
-    # Calcolo e sovrappongo le medie, minimi e massimi
+    
+    # Calcolo e sovrappongo le statistiche
     grouped = df.groupby('Algoritmo')['Valori']
     means = grouped.mean().values
     mins = grouped.min().values
     maxs = grouped.max().values
-
-    for i, (mean, min_val, max_val) in enumerate(zip(means, mins, maxs)):
-        ax.text(i, mean, f'Mean: {mean:.2f}', horizontalalignment='center', color='red', weight='semibold')
-        ax.text(i, min_val, f'Min: {min_val:.2f}', horizontalalignment='center', color='blue', weight='semibold')
-        ax.text(i, max_val, f'Max: {max_val:.2f}', horizontalalignment='center', color='green', weight='semibold')
-
+    medians = grouped.median().values
+    q1 = grouped.quantile(0.25).values
+    q3 = grouped.quantile(0.75).values
+    
+    offset = 0.02 * (max(maxs) - min(mins))  # Calcolo un offset basato sul range dei dati
+    
+    for i, (mean, min_val, max_val, median, q1_val, q3_val) in enumerate(zip(means, mins, maxs, medians, q1, q3)):
+        ax.text(i, min_val, f'Min: {min_val:.2f}', horizontalalignment='center', color='blue', weight='semibold', fontsize=8)
+        ax.text(i, max_val, f'Max: {max_val:.2f}', horizontalalignment='center', color='green', weight='semibold', fontsize=8)
+        ax.text(i, q1_val, f'Q1: {q1_val:.2f}', horizontalalignment='center', color='orange', weight='semibold', fontsize=8)
+        ax.text(i, q3_val, f'Q3: {q3_val:.2f}', horizontalalignment='center', color='brown', weight='semibold', fontsize=8)
+        
+        # Distanziamo leggermente media e mediana
+        ax.text(i, mean + offset, f'Media: {mean:.2f}', horizontalalignment='center', color='red', weight='semibold', fontsize=8)
+        ax.text(i, median - offset, f'Mediana: {median:.2f}', horizontalalignment='center', color='purple', weight='semibold', fontsize=8)
+    
     # Aggiungo le etichette
-    plt.title(title)
-    plt.xlabel('Algoritmo')
-    plt.ylabel(ylabel)
-
+    plt.title(title, fontsize=14)
+    plt.xlabel('Algoritmo', fontsize=12)
+    plt.ylabel(ylabel, fontsize=12)
+    
+    # Ruoto le etichette sull'asse x per una migliore leggibilità
+    plt.xticks(rotation=45)
+    
+    # Aggiusto il layout per evitare sovrapposizioni
+    plt.tight_layout()
+    
     # Salvo il plot come immagine
     plt.savefig(savefig)
-
+    
     # Mostro il plot
     plt.show()
 
@@ -271,6 +284,26 @@ def get_times_dict():
     }
     return times_dict
 
+def print_model_hyperparameters():
+    models = {
+        'Tabu Search': TABU,
+        'Genetic Algorithm Crossover T1': GACT1,
+        'Genetic Algorithm Crossover T2': GACT2,
+        'Genetic Algorithm Crossover T3': GACT3,
+        'Genetic Algorithm Local Search Crossover T1': GALSCT1,
+        'Genetic Algorithm Local Search Crossover T2': GALSCT2,
+        'Genetic Algorithm Local Search Crossover T3': GALSCT3
+    }
+
+    for model_name, model_key in models.items():
+        best_data = util.carica_parametri_modello(model_key, BEST_PARAMS_FILE)
+        params = best_data['params']
+        
+        print(f"Model: {model_name}")
+        for param, value in params.items():
+            print(f"  {param}: {value}")
+        print("\n" + "-"*40 + "\n")
+
 
 if __name__ == '__main__':
     #NSP.start()
@@ -282,12 +315,12 @@ if __name__ == '__main__':
     # get_results('best_fitness', 'Box Plot dei Valori di Fitness per Algoritmo', 'Valori di Fitness')
 
     # Box plot di fitness
-    get_fitness()
-    times_dict = get_times_dict()
-    util.plot_cumulative_execution_times(times_dict=times_dict, savefig=SAVEFIG_CET)
-    util.get_execution_time_stats(times_dict=times_dict, savefig=SAVEFIG_ETS)
+    #get_fitness()
+    #times_dict = get_times_dict()
+    #util.plot_cumulative_execution_times(times_dict=times_dict, savefig=SAVEFIG_CET)
+    #util.get_execution_time_stats(times_dict=times_dict, savefig=SAVEFIG_ETS)
 
     #NSP.shutdown()
-
+    print_model_hyperparameters()
     
 

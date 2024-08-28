@@ -1,0 +1,15 @@
+{
+    "model_name": "Random Forest",
+    "best_params": {
+        "n_estimators": 93,
+        "max_depth": 9,
+        "min_samples_split": 16,
+        "min_samples_leaf": 3
+    },
+    "best_accuracy": 0.8387499999999999,
+    "final_accuracy": 0.8478260869565217,
+    "precision": 0.8497444767670415,
+    "recall": 0.8478260869565217,
+    "f1_score": 0.8483801854382919,
+    "overfitting_analysis": "Il modello sembra ben bilanciato.\nTrain score: media = 0.885938, std = 0.010597\nTest score: media = 0.838750, std = 0.058683\nTrain varianza: 0.000112\nTest varianza: 0.003444\nIl modello sembra stabile sui dati di test."
+}

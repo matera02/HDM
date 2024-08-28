@@ -1,0 +1,16 @@
+{
+    "model_name": "Gradient Boosting",
+    "best_params": {
+        "n_estimators": 183,
+        "learning_rate": 0.03526678108288866,
+        "max_depth": 2,
+        "min_samples_split": 10,
+        "min_samples_leaf": 16
+    },
+    "best_accuracy": 0.8474999999999999,
+    "final_accuracy": 0.8260869565217391,
+    "precision": 0.8313979119231986,
+    "recall": 0.8260869565217391,
+    "f1_score": 0.8271771889823624,
+    "overfitting_analysis": "Il modello sembra ben bilanciato.\nTrain score: media = 0.867500, std = 0.009550\nTest score: media = 0.847500, std = 0.033448\nTrain varianza: 0.000091\nTest varianza: 0.001119\nIl modello sembra stabile sui dati di test."
+}

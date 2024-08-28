@@ -1,0 +1,16 @@
+{
+    "model_name": "ES_ANN",
+    "best_params": {
+        "module__hidden_size": 64,
+        "module__dropout_rate": 0.6513712125759036,
+        "max_epochs": 20,
+        "lr": 0.000692804683095548,
+        "batch_size": 32
+    },
+    "best_accuracy": 0.813890421033278,
+    "final_accuracy": 0.8260869565217391,
+    "precision": 0.8281416253898367,
+    "recall": 0.8260869565217391,
+    "f1_score": 0.8267202119294765,
+    "overfitting_analysis": "Il modello sembra ben bilanciato.\nTrain score: media = 0.826190, std = 0.012188\nTest score: media = 0.811224, std = 0.054613\nTrain varianza: 0.000149\nTest varianza: 0.002983\nIl modello sembra stabile sui dati di test."
+}

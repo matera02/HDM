@@ -1,14 +1,14 @@
 {
     "model_name": "Logistic Regression",
     "best_params": {
-        "C": 0.001,
+        "C": 0.1536351925055615,
         "penalty": "l2",
-        "solver": "liblinear"
+        "max_iter": 788
     },
-    "best_accuracy": 0.8247563890421035,
-    "final_accuracy": 0.8097826086956522,
-    "precision": 0.8143037968103467,
-    "recall": 0.8097826086956522,
-    "f1_score": 0.810867859003755,
-    "overfitting_analysis": "Il modello sembra ben bilanciato.\nTrain score: media = 0.825, std = 0.009\nTest score: media = 0.825, std = 0.036\nTrain varianza: 0.000\nTest varianza: 0.001\nIl modello sembra stabile sui dati di test."
+    "best_accuracy": 0.8324999999999999,
+    "final_accuracy": 0.7880434782608695,
+    "precision": 0.7946816770186335,
+    "recall": 0.7880434782608695,
+    "f1_score": 0.7894785905774205,
+    "overfitting_analysis": "Il modello sembra ben bilanciato.\nTrain score: media = 0.842187, std = 0.011567\nTest score: media = 0.832500, std = 0.047500\nTrain varianza: 0.000134\nTest varianza: 0.002256\nIl modello sembra stabile sui dati di test."
 }

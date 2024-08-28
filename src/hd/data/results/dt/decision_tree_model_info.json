@@ -1,14 +1,14 @@
 {
     "model_name": "Decision Tree",
     "best_params": {
-        "max_depth": 3,
-        "min_samples_leaf": 1,
-        "min_samples_split": 2
+        "max_depth": 22,
+        "min_samples_split": 20,
+        "min_samples_leaf": 7
     },
-    "best_accuracy": 0.8029968744254458,
-    "final_accuracy": 0.7717391304347826,
-    "precision": 0.784463785256987,
-    "recall": 0.7717391304347826,
-    "f1_score": 0.7736494916100056,
-    "overfitting_analysis": "Il modello sembra ben bilanciato.\nTrain score: media = 0.814, std = 0.011\nTest score: media = 0.803, std = 0.032\nTrain varianza: 0.000\nTest varianza: 0.001\nIl modello sembra stabile sui dati di test."
+    "best_accuracy": 0.8125,
+    "final_accuracy": 0.7663043478260869,
+    "precision": 0.7753128804605767,
+    "recall": 0.7663043478260869,
+    "f1_score": 0.7680784349026315,
+    "overfitting_analysis": "Il modello sembra ben bilanciato.\nTrain score: media = 0.862813, std = 0.008232\nTest score: media = 0.812500, std = 0.033541\nTrain varianza: 0.000068\nTest varianza: 0.001125\nIl modello sembra stabile sui dati di test."
 }
