@@ -1,5 +1,7 @@
 # Documentazione - HDM
 
+---
+
 **Gruppo di lavoro**:
 
 - Manuel Roberto Matera
@@ -11,6 +13,10 @@
 **Link per la repo**: [GitHub - matera02/HDM: Hospital Decision Maker](https://github.com/matera02/HDM.git)
 
 **AA**: 2023-24
+
+**Requisiti funzionali**: sono presenti nel file **requirements.txt**.
+
+---
 
 # Indice
 
@@ -55,6 +61,8 @@
       - [Ricerca basata su isole](#ricerca-basata-su-isole)
   
   - [Valutazioni](#valutazioni)
+    
+    - [Considerazioni finali](#considerazioni-finali)
 
 - [Secondo capitolo](#secondo-capitolo)
   
@@ -106,9 +114,11 @@
     
     - [Risultati complessivi](#risultati-complessivi)
 
-- [Conclusione](#conclusione)
+- [Conclusione e sviluppi futuri](#conclusione-e-sviluppi-futuri)
 
 - [Riferimenti bibliografici](#riferimenti-bibliografici)
+
+---
 
 ## Introduzione
 
@@ -119,6 +129,8 @@ Il primo capitolo affronta un **problema di ricerca** su un **grafo** che rappre
 Nel secondo capitolo viene affrontato il problema di pianificazione dei turni degli infermieri come **problema di ottimizzazione**, utilizzando come algoritmi la **Tabu Search** e gli **Algoritmi Genetici** con varianti ibride che sfruttano la **Local Search** dopo la fase di mutazione.
 
 Il terzo capitolo si concentra su un task di **classificazione binaria**, il cui obiettivo è prevedere la presenza di malattie cardiache nei pazienti.
+
+---
 
 # Primo Capitolo
 
@@ -862,19 +874,27 @@ Entrambi gli algoritmi mostrano un comportamento molto simile fino a 30-40 nodi 
 
 #### Tempi di esecuzione
 
-**Approccio normale**
+#### Approccio normale
 
 ID risulta essere il peggiore fra tutti gli algoritmi in termini di tempo di esecuzione, questo ce lo potevamo aspettare tenendo in considerazione la natura del grafo. 
 
 ![time_stats_bigraph.png](../src/graph/data/biGraph/all_graph/stats/time_stats_bigraph.png)
 
-**Approccio basato su isole**
+#### Approccio basato su isole
 
 A* e DFBB ritornano a mostrare le peggiori prestazioni. ID risulta decisamente migliorato con questo tipo di approccio.
 
 ![isl_time_stats_bigraph.png](../src/graph/data/biGraph/islands/stats/isl_time_stats_bigraph.png)
 
 In generale, l'approccio basato su isole comporta un maggiore overhead, andando ad inficiare sui tempi di esecuzione degli algoritmi: questa osservazione è stata valida per tutti gli algoritmi tranne che per l'ID per le ragioni già discusse in precedenza.
+
+### Considerazioni finali
+
+La strategia solutiva da adottare dipende dalla natura del problema e da ciò che ci aspettiamo come risultato. Se siamo interessati a trovare un percorso che non sia necessariamente il meno costoso in tempi brevi, gli algoritmi DFS e BFS hanno mostrato in linea generale ottime prestazioni in questi termini a scapito del numero di nodi visitati e del numero di percorsi esplorati. Combinare il criterio di ottimalità della BFS nel trovare il percorso con il minimo numero di archi con il vantaggio del limitato consumo di memoria della DFS ha fatto sì che l'ID sia riuscito a ridurre l'esplorazione di nodi e percorsi, tuttavia ciò va a scapito dei suoi tempi di esecuzione. La LCFS ha mostrato un buon compromesso con queste due misure di valutazione adottate, permettendo inoltre di trovare il percorso a costo minimo. Dall'altra parte le strategie di ricerca informata A* e DFBB sono riuscite a ridurre notevolmente l'esplorazione rispetto a tutti gli altri algoritmi, ma con tempi di esecuzione peggiori generalmente. Per valutare meglio questo comportamento andrebbe ingrandito lo spazio di ricerca.
+Sebbene la programmazione dinamica si sia rivelata utile nell'avere dei valori euristici precalcolati, rimane comunque un leggero overhead per l'A* e il DFBB che può essere dovuto alla query del file in prolog relativo alle euristiche, oltre al fatto che per il primo grafo c'è uno spreco di memoria in quanto molti costi sono 'inf', mentre per l'altro sono state sfruttate appieno le capacità dell'algoritmo permettendo comunque per entrambi i grafi ad A* e DFBB di classificarsi come i migliori in termini di risparmio nell'esplorazione dei percorsi e dei nodi.
+L'approccio basato su isole ha mostrato le sue potenzialità con l'aumento della complessità del problema permettendo agli algoritmi di ricerca non informata di ridurre lo spazio di esplorazione, tuttavia ciò va a scapito dei tempi di esecuzione tranne che per il caso dell'ID discusso in precedenza. Mentre per quanto riguarda le strategie informate, come previsto, non ha introdotto grandi novità positive.
+
+---
 
 # Secondo Capitolo
 
@@ -1233,6 +1253,13 @@ Il tuning degli iperparametri è un passaggio fondamentale nel migliorare le per
 
 Per affrontare questa sfida, esiste un metodo avanzato chiamato **ottimizzazione bayesiana**, che può essere implementato in Python usando la libreria  [Optuna](https://optuna.org).
 
+---
+
+**Nota**: In genere non abbiamo trovato nulla sul tuning degli iperparametri per i modelli usati in questo problema di ottimizzazione. Questo processo che abbiamo seguito era volto ad automatizzare la scelta dei parametri, piuttosto che andare a tentativi cercando di capire quali fossero più adatti a ridurre la fitness. 
+Facendo qualche ricerca abbiamo scoperto che ci sono proprio degli studi in cui gli algoritmi genetici stessi venivano utilizzati per il tuning in modelli di ML. 
+
+---
+
 Il processo inizia con la **definizione dello spazio di ricerca**, dove si scelgono gli iperparametri che si desidera ottimizzare. Per ciascuno di questi iperparametri, si specificano i valori possibili o gli intervalli entro cui devono essere esplorati. Questo passaggio stabilisce i limiti entro cui Optuna cercherà la configurazione ottimale. Vediamo ad esempio  nel caso della Tabu Search come i parametri vengono definiti: 
 
 ```python
@@ -1365,14 +1392,6 @@ GALSCT1 condivide il valore minimo più basso (193.12) con GACT3, dimostrando un
 
 GALSCT2 emerge come l'algoritmo più performante in termini di mediana e media, suggerendo la migliore performance complessiva tra tutti gli algoritmi testati. La mediana più bassa (208.08) indica che almeno il 50% delle soluzioni generate da GALSCT2 sono migliori rispetto agli altri algoritmi. Il Q1 più basso (203.94) tra tutti gli algoritmi indica che il 25% delle soluzioni di GALSCT2 sono di qualità superiore rispetto a tutti gli altri metodi, evidenziando una consistente capacità di generare soluzioni di alta qualità. Il valore minimo (193.58), sebbene leggermente superiore a GACT3 e GALSCT1, rimane molto competitivo, suggerendo che GALSCT2 potrebbe privilegiare una performance più consistente rispetto alla ricerca di soluzioni estreme. L'IQR di 7.48, identico a GACT2, indica una buona consistenza nelle soluzioni centrali, bilanciando efficacemente l'esplorazione di nuove soluzioni con lo sfruttamento di quelle promettenti. La piccola differenza tra media (208.19) e mediana (208.08) suggerisce una distribuzione quasi simmetrica, con una leggera tendenza verso valori più alti. Questo potrebbe indicare che GALSCT2 è meno soggetto a produrre outlier estremi rispetto ad altri algoritmi. Il valore massimo (224.18), in linea con GACT3 e GALSCT1, conferma la robustezza dell'algoritmo nel prevenire soluzioni di bassa qualità.
 
-**Osservazioni**
-
-- Mediana: 208.08 (la più bassa)
-
-- Media: 208.19 (la più bassa)
-
-- Q1: 203.94 (il più basso)
-
 **GALSCT3 (Algoritmo Genetico con Local Search e Crossover di Tipo 3)**
 
 GALSCT3 mostra performance solide ma leggermente inferiori rispetto a GALSCT1 e GALSCT2 in termini di valore minimo e mediana/media. Il valore minimo di 196.80, sebbene competitivo, è il più alto tra i GALSCT, suggerendo una minore capacità di trovare soluzioni estremamente ottimali. L'IQR di 6.96, il secondo più basso dopo GACT3, indica un'alta consistenza nelle soluzioni generate. Questo suggerisce che GALSCT3 potrebbe privilegiare la stabilità e la prevedibilità dei risultati rispetto all'esplorazione di soluzioni estreme. La differenza relativamente piccola tra mediana (209.46) e media (210.05) indica una distribuzione leggermente asimmetrica, con una tendenza verso valori più alti (meno desiderabile in un problema di minimizzazione). Il valore massimo (225.56), leggermente superiore agli altri GALSCT, suggerisce che questo algoritmo potrebbe occasionalmente produrre soluzioni di qualità inferiore rispetto ai suoi omologhi. Complessivamente, GALSCT3 sembra offrire un buon compromesso tra consistenza e qualità delle soluzioni, anche se non raggiunge i picchi di performance di GALSCT1 o GALSCT2.
@@ -1391,6 +1410,8 @@ Sebbene la Tabu Search non abbia mostrato performance in termini di fitness degn
 
 ![cumulative_execution_times](../src/csp/data/stats/cumulative_execution_times.png)
 ![time_stats](../src/csp/data/stats/time_stats.png)
+
+---
 
 # Terzo Capitolo
 
@@ -1577,6 +1598,8 @@ Il leggero overfitting già evidente dalle curve di apprendimento viene così co
 ---
 
 Consideriamo il parametro `max_depth` come una misura di complessità, la cui variazione ci fornisce informazioni significative sul rischio di overfitting del modello.
+
+(chiamata complexity per comodità, è sempre una curva d'apprendimento)
 
 ![complexity_curve_dt.png](../src/hd/data/results/dt/complexity_curve_dt.png)
 
@@ -1881,3 +1904,22 @@ Di seguito i risultati ottenuti per ciascun modello discusso
 ![comparison.png](../src/hd/data/results/comparison.png)
 
 Per questo specifico problema, il Random Forest sembra essere il modello più performante, seguito da Gradient Boosting e reti neurali.
+
+---
+
+# Conclusione e sviluppi futuri
+
+Il progetto **HDM** ha dimostrato l'efficacia di diverse metodologie per affrontare problemi complessi legati alla gestione ospedaliera. 
+Nel primo capitolo abbiamo mostrato differenti approcci per risolvere un problema di ricerca in un grafo: le strategie proposte possono essere utilizzate in diversi ambiti in questo contesto, come ad esempio un sistema di tutor per orientarsi all'interno dell'ospedale (supponendo di avere un ospedale sufficientemente grande per cui ciò abbia senso farlo) o per task come la guida autonoma della barella dalla stanza di degenza alla sala operatoria e viceversa. 
+Fra le strategie affrontate abbiamo mostrato le potenzialità della ricerca basata su isole per quanto riguarda il risparmio nello spazio di esplorazione. Tuttavia, si tratta di un approccio puramente personale al problema, perché sembrava conveniente poter astrarlo in tre sottoproblemi più semplici da risolvere. Tuttavia questa astrazione ha giocato il suo costo ed è opportunamente applicabile solamente in determinati contesti, che abbiamo già [discusso](#considerazioni-finali).
+Per uno sviluppo futuro ci auguriamo di mantenere questo grado di astrazione per delle analisi comparative, ma con una differenza nell'implementazione cioè quella di provare a far avanzare simultaneamente la ricerca sia in avanti, partendo dal nodo $start$ al nodo $goal$, sia a ritroso, cioè da nodo $goal$ a nodo $start$, restituendo come soluzione l'intersezione fra le due frontiere degli algoritmi che applicheremo.
+
+Per quanto riguarda il secondo capitolo, abbiamo [mostrato](#conclusioni) come l'introduzione della ricerca locale abbia generalmente migliorato le performance degli algoritmi genetici. In futuro proponiamo di aggiungere i **vincoli soft** per delle ulteriori analisi. 
+
+Nel terzo capitolo abbiamo condotto un'analisi delle curve di apprendimento e delle metriche, che ci ha permesso di identificare i modelli più robusti e quelli che rischiano di incorrere in overfitting. A seconda dell'analisi delle curve, nel caso in cui vi fosse il sospetto di overfitting, abbiamo proposto delle soluzioni sulla base del grafico, cercando di evidenziare eventuali miglioramenti. Nel contesto dell'ANN abbiamo utilizzato l'early stopping come tecnica per prevenire l'overfitting e migliorare la capacità di generalizzazione dei modelli. Stando ai [risultati complessivi](#risultati-complessivi) abbiamo ottenuto dei buoni valori.
+
+# Riferimenti bibliografici
+
+Valgono come riferimenti bibliografici i capitoli relativi agli argomenti trattati nel libro di testo del corso: https://artint.info/3e/html/ArtInt3e.html
+
+In particolare per il capitolo 2 di questo documento il riferimento "ORProject_Final_Copy.pdf" è presente nella cartella `docs`.
