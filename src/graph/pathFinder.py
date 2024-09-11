@@ -16,7 +16,7 @@ class PathFinder:
         #print('DFS: ')
         start_time = time.time()
         frontier = [(start, [start])]
-        visited = set()  # Per il cycle pruning
+        visited = set()  # Per il multiple path pruning
         paths_explored = 0  # Numero di percorsi esplorati
         nodes_visited = 0  # Numero di nodi visitati
 
@@ -28,11 +28,11 @@ class PathFinder:
                 t = time.time() - start_time
                 return path, paths_explored, nodes_visited, t
 
-            if current not in visited:
+            if current not in visited: # Multiple path pruning
                 visited.add(current)
 
                 for adj in graph.neighbors(current):
-                    if adj not in path:  # Multiple path pruning
+                    if adj not in path:  # Cycle pruning
                         new_path = path + [adj]
                         paths_explored += 1
                         #print((adj, new_path))
@@ -61,11 +61,11 @@ class PathFinder:
                 t = time.time() - start_time
                 return path, paths_explored, nodes_visited, t
             
-            if current not in visited: #cp
+            if current not in visited: #mpp
                 visited.add(current)
             
                 for adj in graph.neighbors(current):
-                    if adj not in path: #mpp
+                    if adj not in path: #cp
                         paths_explored += 1
                         #print((adj, path + [adj]))
                         frontier.put((adj, path + [adj]))
@@ -85,7 +85,7 @@ class PathFinder:
                 return path, paths_explored, nodes_visited
             
             if bound > 0:
-                visited.add(node)  # Aggiungi il nodo corrente ai visitati
+                visited.add(node)  #mpp
                 
                 for adj in graph.neighbors(node):
                     if adj not in path and adj not in visited:  # Multiple path pruning e cycle pruning
@@ -95,7 +95,7 @@ class PathFinder:
                         if result is not None:
                             return result, pe, nv
     
-                visited.remove(node)  # Rimuovi il nodo corrente dai visitati dopo l'esplorazione
+                visited.remove(node)  #mpp
                 
             return None, paths_explored, nodes_visited
     
@@ -107,7 +107,7 @@ class PathFinder:
             max_bound = len(graph.nodes())  # Limite massimo della profondità basato sul numero di nodi del grafo
         
         while bound <= max_bound:
-            visited = set()  # Inizializza l'insieme dei nodi visitati per ogni livello di profondità
+            visited = set()  # insieme dei nodi visitati per ogni livello di profondità
             result, pe, nv = DepthLimitedSearch(graph, start, goal, bound, [start], paths_explored, nodes_visited, visited)
             paths_explored = pe
             nodes_visited = nv
@@ -132,7 +132,7 @@ class PathFinder:
         nodes_visited = 0
 
         frontier.put((0, (start, [start])))
-        best_costs[start] = 0  # Inizializza il miglior costo per il nodo di partenza
+        best_costs[start] = 0 
 
         while not frontier.empty():
             priority, (current, path) = frontier.get()
@@ -143,13 +143,13 @@ class PathFinder:
                 t = time.time() - start_time
                 return path, paths_explored, nodes_visited, t
 
-            if current not in visited:
+            if current not in visited: #mpp
                 visited.add(current)
                 if current in graph:
                     for adj in graph.neighbors(current):
                         weight = graph.get_edge_data(current, adj)['weight']
                         new_cost = priority + weight
-                        if adj not in best_costs or new_cost < best_costs[adj]:  # Multiple path pruning
+                        if adj not in best_costs or new_cost < best_costs[adj]:  # mpp
                             best_costs[adj] = new_cost
                             frontier.put((new_cost, (adj, path + [adj])))
                             paths_explored += 1
@@ -317,12 +317,12 @@ class PathFinder:
                     return PathFinder.__get_cost(graph, path), paths_explored, nodes_visited
                 else:
                     for adj in graph.neighbors(current):
-                        if adj not in path:
+                        if adj not in path: # cp
                             new_path = path + [adj]
                             new_f = PathFinder.__get_f(prolog, graph, new_path, goal)
                             paths_explored += 1
-                            if adj not in visited or new_f < visited[adj]:
-                                visited[adj] = new_f
+                            if adj not in visited or new_f < visited[adj]: # mpp
+                                visited[adj] = new_f #mpp
                                 frontier.append((new_f, (adj, new_path)))
             return bound, paths_explored, nodes_visited
 
